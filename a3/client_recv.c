@@ -28,75 +28,75 @@ char ctrl2rcvr_fname[MAX_FILE_NAME_LEN];
 
 
 void usage(char **argv) {
-	printf("usage:\n");
-	printf("%s -f <msg queue file name>\n",argv[0]);
-	exit(1);
+  printf("usage:\n");
+  printf("%s -f <msg queue file name>\n",argv[0]);
+  exit(1);
 }
 
 
 void open_client_channel(int *qid) {
 
-	/* Get messsage channel */
-	key_t key = ftok(ctrl2rcvr_fname, 42);
+  /* Get messsage channel */
+  key_t key = ftok(ctrl2rcvr_fname, 42);
 
-	if ((*qid = msgget(key, 0400)) < 0) {
-		perror("open_channel - msgget failed");
-		fprintf(stderr,"for message channel ./msg_channel\n");
+  if ((*qid = msgget(key, 0400)) < 0) {
+    perror("open_channel - msgget failed");
+    fprintf(stderr,"for message channel ./msg_channel\n");
 
-		/* No way to tell parent about our troubles, unless/until it 
-		 * wait's for us.  Quit now.
-		 */
-		exit(1);
-	}
+    /* No way to tell parent about our troubles, unless/until it 
+     * wait's for us.  Quit now.
+     */
+    exit(1);
+  }
 
-	return;
+  return;
 }
 
 void send_error(int qid, u_int16_t code)
 {
-	/* Send an error result over the message channel to client control process */
-	msg_t msg;
+  /* Send an error result over the message channel to client control process */
+  msg_t msg;
 
-	msg.mtype = CTRL_TYPE;
-	msg.body.status = RECV_NOTREADY;
-	msg.body.value = code;
+  msg.mtype = CTRL_TYPE;
+  msg.body.status = RECV_NOTREADY;
+  msg.body.value = code;
 
-	if (msgsnd(qid, &msg, sizeof(struct body_s), 0) < 0) {
-		perror("send_error msgsnd");
-	}
-							 
+  if (msgsnd(qid, &msg, sizeof(struct body_s), 0) < 0) {
+    perror("send_error msgsnd");
+  }
+               
 }
 
 void send_ok(int qid, u_int16_t port)
 {
-	/* Send "success" result over the message channel to client control process */
-	msg_t msg;
+  /* Send "success" result over the message channel to client control process */
+  msg_t msg;
 
-	msg.mtype = CTRL_TYPE;
-	msg.body.status = RECV_READY;
-	msg.body.value = port;
+  msg.mtype = CTRL_TYPE;
+  msg.body.status = RECV_READY;
+  msg.body.value = port;
 
-	if (msgsnd(qid, &msg, sizeof(struct body_s), 0) < 0) {
-		perror("send_ok msgsnd");
-	} 
+  if (msgsnd(qid, &msg, sizeof(struct body_s), 0) < 0) {
+    perror("send_ok msgsnd");
+  } 
 
 }
 
 void init_receiver()
 {
 
-	/* 1. Make sure we can talk to parent (client control process) */
-	printf("Trying to open client channel\n");
+  /* 1. Make sure we can talk to parent (client control process) */
+  printf("Trying to open client channel\n");
 
-	open_client_channel(&ctrl2rcvr_qid);
+  open_client_channel(&ctrl2rcvr_qid);
 
-	/**** YOUR CODE TO FILL IMPLEMENT STEPS 2 AND 3 ****/
+  /**** YOUR CODE TO FILL IMPLEMENT STEPS 2 AND 3 ****/
 
-	/* 2. Initialize UDP socket for receiving chat messages. */
+  /* 2. Initialize UDP socket for receiving chat messages. */
 
-	/* 3. Tell parent the port number if successful, or failure code if not. 
-	 *    Use the send_error and send_ok functions
-	 */
+  /* 3. Tell parent the port number if successful, or failure code if not. 
+   *    Use the send_error and send_ok functions
+   */
 
 }
 
@@ -108,7 +108,7 @@ void init_receiver()
 void handle_received_msg(char *buf)
 {
 
-	/**** YOUR CODE HERE ****/
+  /**** YOUR CODE HERE ****/
 
 }
 
@@ -126,54 +126,54 @@ void handle_received_msg(char *buf)
  */
 void receive_msgs()
 {
-	char *buf = (char *)malloc(MAX_MSG_LEN);
+  char *buf = (char *)malloc(MAX_MSG_LEN);
   
-	if (buf == 0) {
-		printf("Could not malloc memory for message buffer\n");
-		exit(1);
-	}
+  if (buf == 0) {
+    printf("Could not malloc memory for message buffer\n");
+    exit(1);
+  }
 
 
-	/**** YOUR CODE HERE ****/
+  /**** YOUR CODE HERE ****/
 
-	while(TRUE) {
+  while(TRUE) {
 
-		/**** YOUR CODE HERE ****/
+    /**** YOUR CODE HERE ****/
 
-	}
+  }
 
-	/* Cleanup */
-	free(buf);
-	return;
+  /* Cleanup */
+  free(buf);
+  return;
 }
 
 
 int main(int argc, char **argv) {
-	char option;
+  char option;
 
-	printf("RECEIVER alive: parsing options! (argc = %d\n",argc);
+  printf("RECEIVER alive: parsing options! (argc = %d\n",argc);
 
-	while((option = getopt(argc, argv, option_string)) != -1) {
-		switch(option) {
-		case 'f':
-			strncpy(ctrl2rcvr_fname, optarg, MAX_FILE_NAME_LEN);
-			break;
-		default:
-			printf("invalid option %c\n",option);
-			usage(argv);
-			break;
-		}
-	}
+  while((option = getopt(argc, argv, option_string)) != -1) {
+    switch(option) {
+    case 'f':
+      strncpy(ctrl2rcvr_fname, optarg, MAX_FILE_NAME_LEN);
+      break;
+    default:
+      printf("invalid option %c\n",option);
+      usage(argv);
+      break;
+    }
+  }
 
-	if(strlen(ctrl2rcvr_fname) == 0) {
-		usage(argv);
-	}
+  if(strlen(ctrl2rcvr_fname) == 0) {
+    usage(argv);
+  }
 
-	printf("Receiver options ok... initializing\n");
+  printf("Receiver options ok... initializing\n");
 
-	init_receiver();
+  init_receiver();
 
-	receive_msgs();
+  receive_msgs();
 
-	return 0;
+  return 0;
 }
