@@ -36,7 +36,7 @@ struct location_server_manager {
  * This struct manages the receiver. Including creating the reciver,
  * shutting the receiver down, establish udp connecting to and sending out messages.
  */
-struct messenger {
+struct receiver_communicator {
   
 }
 
