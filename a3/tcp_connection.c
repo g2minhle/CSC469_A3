@@ -31,11 +31,11 @@ int init_tcp_connection(struct tcp_connection* tcp_con,
 
   /* open socket */
   tcp_con->sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if(clientContext->sock < 0){
+  if ( tcp_con->sock < 0 ) {
     return TCP_CANNOT_BIND_TO_SOCKET;
   }
 
-  if(connect(clientContext->sock,(struct sockaddr *)&addr, sizeof(addr)) < 0){
+  if( connect(tcp_con->sock, (struct sockaddr*)&addr, sizeof(addr)) < 0 ) {
     return TCP_CANNOT_CONNECT;
   }
 
@@ -60,10 +60,10 @@ int init_tcp_connection(struct tcp_connection* tcp_con,
  */
 char* send_request(struct tcp_connection* tcp_con, 
                     char* data, 
-                    size_t data,
+                    size_t data_size,
                     int* nerror) {
-  int io_result = write(sd, data, sizeof(data)) 
-  if( write(sd, data, sizeof(data)) < 0 ) {
+  int io_result = write(tcp_con->sock, data, data_size);
+  if( io_result < 0 ) {
     *nerror = TCP_WRITE_ERROR;
     return NULL;
   }
@@ -72,7 +72,7 @@ char* send_request(struct tcp_connection* tcp_con,
   size_t buf_used = 0;
   
   while(buf_used < TCP_BUFFER_SIZE) {
-    io_result  = read(tcp_con->sock, &buf[totalcnt], TCP_BUFFER_SIZE - buf_used);
+    io_result  = read(tcp_con->sock, &buf[buf_used], TCP_BUFFER_SIZE - buf_used);
     if(io_result  < 0) {
       *nerror = TCP_READ_ERROR;
       free(buf);
@@ -86,7 +86,7 @@ char* send_request(struct tcp_connection* tcp_con,
       buf_used +=  io_result ;
     }
   }
-  return buff;  
+  return buf;  
 }
 
 /*

@@ -7,7 +7,7 @@
 #include <netdb.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <malloc.c>
+#include <malloc.h>
 
 #define TCP_BUFFER_SIZE 640
 
@@ -23,8 +23,7 @@
  */
 struct tcp_connection {  
 	int sock;
-}
-
+};
 
 /*
  * Establish a TCP connection given the host name and the TCP port.
@@ -59,7 +58,7 @@ int init_tcp_connection(struct tcp_connection* tcp_con,
  */
 char* send_request(struct tcp_connection* tcp_con, 
                     char* data, 
-                    size_t data,
+                    size_t data_size,
                     int* nerror);
 
 /*
