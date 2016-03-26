@@ -25,6 +25,11 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
     sizeof(struct tcp_connection)
   );
   
+  if (tcp_con == NULL) {
+    *nerror = TCP_RUN_OF_OF_MEM;
+    return NULL; 
+  }
+  
   struct sockaddr_in addr;
   struct hostent* host_entry;
 
