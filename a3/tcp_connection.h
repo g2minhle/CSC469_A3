@@ -11,7 +11,7 @@
 
 #define TCP_BUFFER_SIZE 640
 
-#define NO_ERROR 0
+#define TCP_NO_ERROR 0
 #define TCP_ERROR_CANNOT_RESOLVE_HOST 1
 #define TCP_CANNOT_BIND_TO_SOCKET 2
 #define TCP_CANNOT_CONNECT 3
@@ -35,10 +35,17 @@ struct tcp_connection {
  *      The server host name.
  *    int port:
  *      The server port.
+ *    int* nerror:
+ *      The error code if any.
+ *
+ * Return:
+ *    struct tcp_connection*:
+ *      The new tcp connection.
+ *      If there is an error return NULL;
  */
-int init_tcp_connection(struct tcp_connection* tcp_con, 
-                        const char* host_name, 
-                        int port);
+struct tcp_connection* create_tcp_connection(const char* host_name, 
+                                            int port,
+                                            int* nerror);
                         
 /*
  * Send a tcp message throught the given tcp_connection and get the respond.
@@ -50,6 +57,8 @@ int init_tcp_connection(struct tcp_connection* tcp_con,
  *      The message content.
  *    size_t data:
  *      The size of the message.
+ *    int* nerror:
+ *      The error code if any
  *
  * Return:
  *    char*:

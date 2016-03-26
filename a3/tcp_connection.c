@@ -10,18 +10,30 @@
  *      The server host name.
  *    int port:
  *      The server port.
+ *    int* nerror:
+ *      The error code if any.
+ *
+ * Return:
+ *    struct tcp_connection*:
+ *      The new tcp connection.
+ *      If there is an error return NULL;
  */
-int init_tcp_connection(struct tcp_connection* tcp_con, 
-                        const char* host_name, 
-                        int port){
+struct tcp_connection* create_tcp_connection(const char* host_name, 
+                                            int port,
+                                            int* nerror){
+  struct tcp_connection* tcp_con = (struct tcp_connection*)malloc(
+    sizeof(struct tcp_connection*)
+  );
+  
   struct sockaddr_in addr;
   struct hostent* host_entry;
 
   /*get ip address of the host*/
   host_entry = gethostbyname(host_name);
 
-  if (!host_entry){
-    return TCP_ERROR_CANNOT_RESOLVE_HOST;
+  if (!host_entry) {
+    *nerror = TCP_ERROR_CANNOT_RESOLVE_HOST;
+    return NULL;
   } 
 
   memset(&addr,0,sizeof(addr));
@@ -32,14 +44,16 @@ int init_tcp_connection(struct tcp_connection* tcp_con,
   /* open socket */
   tcp_con->sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if ( tcp_con->sock < 0 ) {
-    return TCP_CANNOT_BIND_TO_SOCKET;
+    *nerror = TCP_CANNOT_BIND_TO_SOCKET;
+    return NULL;
   }
 
   if( connect(tcp_con->sock, (struct sockaddr*)&addr, sizeof(addr)) < 0 ) {
-    return TCP_CANNOT_CONNECT;
+    *nerror = TCP_CANNOT_CONNECT;
+    return NULL;
   }
 
-  return NO_ERROR;
+  return TCP_NO_ERROR;
 }
 
 /*
@@ -52,6 +66,8 @@ int init_tcp_connection(struct tcp_connection* tcp_con,
  *      The message content.
  *    size_t data:
  *      The size of the message.
+ *    int* nerror:
+ *      The error code if any.
  *
  * Return:
  *    char*:
@@ -98,4 +114,5 @@ char* send_request(struct tcp_connection* tcp_con,
  */
 void close_tcp_connection(struct tcp_connection* tcp_con) {
   close(tcp_con->sock);
+  free(tcp_con);
 }
