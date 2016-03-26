@@ -1,5 +1,5 @@
-#ifndef TCP_CONNECTION_H
-#define TCP_CONNECTION_H
+#ifndef _TCP_CONNECTION_H
+#define _TCP_CONNECTION_H
 
 #include <errno.h>
 #include <string.h>
