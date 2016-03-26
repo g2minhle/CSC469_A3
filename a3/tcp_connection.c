@@ -22,7 +22,7 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
                                             int port,
                                             int* nerror){
   struct tcp_connection* tcp_con = (struct tcp_connection*)malloc(
-    sizeof(struct tcp_connection*)
+    sizeof(struct tcp_connection)
   );
   
   struct sockaddr_in addr;
@@ -53,7 +53,7 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
     return NULL;
   }
 
-  return TCP_NO_ERROR;
+  return tcp_con;
 }
 
 /*
