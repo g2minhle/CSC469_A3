@@ -74,7 +74,7 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
  *      The pointer to the repond. 
  *      If there is an error then we will return NULL.
  */
-char* send_request(struct tcp_connection* tcp_con, 
+char* send_tcp_request(struct tcp_connection* tcp_con, 
                     char* data, 
                     size_t data_size,
                     int* nerror) {
