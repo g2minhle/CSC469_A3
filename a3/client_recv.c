@@ -108,11 +108,11 @@ void init_receiver()
 
 
 /* Function to deal with a single message from the chat server */
-
 void handle_received_msg(char *buf)
 {
-	//struct chat_msghdr* cmh = (struct chat_msghdr *)buf;
+	struct chat_msghdr* cmh = (struct chat_msghdr *)buf;
 
+  printf("%s: %s\n", cmh->sender, cmh->msgdata);
 }
 
 /* Main function to receive and deal with messages from chat server
@@ -180,7 +180,7 @@ void receive_msgs()
         exit(0);
       }
 
-      handle_received_msg(buf);
+      handle_received_msg(buf+sizeof(msg_t));
     }
   }
 
