@@ -93,8 +93,6 @@ void init_receiver()
 
   open_client_channel(&ctrl2rcvr_qid);
 
-  /**** YOUR CODE TO FILL IMPLEMENT STEPS 2 AND 3 ****/
-
   
   /* 2. Initialize UDP socket for receiving chat messages. */
 
@@ -112,7 +110,7 @@ void handle_received_msg(char *buf)
 {
 	struct chat_msghdr* cmh = (struct chat_msghdr *)buf;
 
-  printf("%s: %s\n", cmh->sender, cmh->msgdata);
+  printf("%s: %s\n", (char *)cmh->sender.member_name, *(cmh->msgdata));
 }
 
 /* Main function to receive and deal with messages from chat server
@@ -155,12 +153,16 @@ void receive_msgs()
     else if(FD_ISSET(udp_fd, &fds)) // probably don't need to check the FD, but oh well.
     {
       msg_len = recvfrom(udp_fd, buf, MAX_MSG_LEN, 0, NULL, 0);
+
+      // Check if we failed to grab a message
       if(msg_len<0) {
         perror("client_recv recvfrom");
-        return;
+        /* don't do anything about this error. just log the error message */
       }
-      handle_received_msg(buf);
-
+      else // we got a message
+      {
+        handle_received_msg(buf);
+      }
     }
 
     bzero(buf, MAX_MSG_LEN);
@@ -174,12 +176,16 @@ void receive_msgs()
     {
       msg_t* msg = (msg_t*)buf;
 
+      // check if the message is telling the receiver to quit. in which case
+      // exit immediately after closing all communication channels
       if (msg->body.status==CHAT_QUIT){
-        printf("Exitting the chat. Have a good day");
+        printf("Exitting the chat. Have a good day.\n");
         close(udp_fd);
-        exit(0);
+        return;
       }
 
+      // else it's a simple message. get the chat_msg struct that falls
+      // after the msg_t header information.
       handle_received_msg(buf+sizeof(msg_t));
     }
   }
