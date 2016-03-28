@@ -112,14 +112,6 @@ void init_receiver()
 void handle_received_msg(char *buf)
 {
 	//struct chat_msghdr* cmh = (struct chat_msghdr *)buf;
-  
-
-  /**** YOUR CODE HERE ****/
-
-}
-
-void handle_client_msg(char* buf, ssize_t len)
-{
 
 }
 
@@ -174,15 +166,22 @@ void receive_msgs()
     bzero(buf, MAX_MSG_LEN);
     // check the IPC message for any incoming message from the chat client
     msg_len = msgrcv(ctrl2rcvr_qid, buf, MAX_MSG_LEN, 0, IPC_NOWAIT);
-    if (msg_len < 0){
-      if (errno != ENOMSG)
+    if (msg_len < 0 && errno != ENOMSG)
+    {
         perror("client_recv msgrcv");
     }
-    else
+    else 
     {
-      handle_client_msg (buf, msg_len);
-    }
+      msg_t* msg = (msg_t*)buf;
 
+      if (msg->body.status==CHAT_QUIT){
+        printf("Exitting the chat. Have a good day");
+        close(udp_fd);
+        exit(0);
+      }
+
+      handle_received_msg(buf);
+    }
   }
 
   /* Cleanup */
