@@ -24,6 +24,7 @@ static char *option_string = "f:";
 
 /* vars for UDP socket connection */
 int udp_fd = 0;
+int udp_port = 0;
 
 /* For communication with chat client control process */
 int ctrl2rcvr_qid;
@@ -85,6 +86,47 @@ void send_ok(int qid, u_int16_t port)
 
 }
 
+int init_udp_socket()
+{
+	struct sockaddr_in addr;
+	socklen_t addr_len;
+	int socket_fd;
+	char type_str[4];
+
+	addr_len = sizeof(addr);
+
+	if( (socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+		perror("socket");
+		exit(1);
+	}
+
+	bzero(&addr, addr_len);
+	addr.sin_family = AF_INET;
+	addr.sin_port = 0;
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+  if( bind(socket_fd, (struct sockaddr *)&addr, addr_len) < 0 )
+  {
+    perror("bind");
+    exit(1);
+  }
+
+  if( getsockname(socket_fd, (struct sockaddr *)&addr, &addr_len) < 0 )
+  {
+    perror("getsockname");
+    exit(1);
+  }
+  udp_port = ntohs(addr.sin_port);
+
+	/* server is created successfully */
+
+  snprintf(type_str, 4, "UDP");
+
+	printf("Chat receiver listening on %s port: %hu\n", type_str, udp_port);
+
+	return socket_fd;
+}
+
 void init_receiver()
 {
 
@@ -93,13 +135,22 @@ void init_receiver()
 
   open_client_channel(&ctrl2rcvr_qid);
 
-  
+
   /* 2. Initialize UDP socket for receiving chat messages. */
+  u_int16_t ret = init_udp_socket();
 
   /* 3. Tell parent the port number if successful, or failure code if not. 
    *    Use the send_error and send_ok functions
    */
+  if (ret>=0)
+    send_ok(ctrl2rcvr_qid, udp_port);
+  else
+  {
+    send_error(ctrl2rcvr_qid, ret);
+    return;
+  }
 
+  udp_fd = ret;
 }
 
 
