@@ -57,8 +57,10 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
  *      The message content.
  *    size_t data:
  *      The size of the message.
+ *    size_t* respond_size:
+ *      The size of the respond
  *    int* nerror:
- *      The error code if any
+ *      The error code if any.
  *
  * Return:
  *    char*:
@@ -68,6 +70,7 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
 char* send_tcp_request(struct tcp_connection* tcp_con, 
                     char* data, 
                     size_t data_size,
+                    size_t* respond_size,
                     int* nerror);
 
 /*

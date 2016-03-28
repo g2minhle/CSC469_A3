@@ -71,6 +71,8 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
  *      The message content.
  *    size_t data:
  *      The size of the message.
+ *    size_t* respond_size:
+ *      The size of the respond
  *    int* nerror:
  *      The error code if any.
  *
@@ -82,6 +84,7 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
 char* send_tcp_request(struct tcp_connection* tcp_con, 
                     char* data, 
                     size_t data_size,
+                    size_t* respond_size,
                     int* nerror) {
   int io_result = write(tcp_con->sock, data, data_size);
   if( io_result < 0 ) {
@@ -90,10 +93,12 @@ char* send_tcp_request(struct tcp_connection* tcp_con,
   }
   
   char* buf = (char*) malloc(TCP_BUFFER_SIZE);
-  size_t buf_used = 0;
+  *respond_size = 0;
   
-  while(buf_used < TCP_BUFFER_SIZE) {
-    io_result  = read(tcp_con->sock, &buf[buf_used], TCP_BUFFER_SIZE - buf_used);
+  while(*respond_size < TCP_BUFFER_SIZE) {
+    io_result  = read(tcp_con->sock, 
+                      &buf[*respond_size], 
+                      TCP_BUFFER_SIZE - *respond_size);
     if(io_result  < 0) {
       *nerror = TCP_READ_ERROR;
       free(buf);
@@ -104,9 +109,10 @@ char* send_tcp_request(struct tcp_connection* tcp_con,
       break;
     }
     else {
-      buf_used +=  io_result ;
+      *respond_size +=  io_result ;
     }
   }
+  
   return buf;  
 }
 
