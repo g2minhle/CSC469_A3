@@ -22,6 +22,9 @@
 
 static char *option_string = "f:";
 
+/* vars for UDP socket connection */
+int udp_fd = 0;
+
 /* For communication with chat client control process */
 int ctrl2rcvr_qid;
 char ctrl2rcvr_fname[MAX_FILE_NAME_LEN];
@@ -92,6 +95,7 @@ void init_receiver()
 
   /**** YOUR CODE TO FILL IMPLEMENT STEPS 2 AND 3 ****/
 
+  
   /* 2. Initialize UDP socket for receiving chat messages. */
 
   /* 3. Tell parent the port number if successful, or failure code if not. 
@@ -107,12 +111,17 @@ void init_receiver()
 
 void handle_received_msg(char *buf)
 {
+	//struct chat_msghdr* cmh = (struct chat_msghdr *)buf;
+  
 
   /**** YOUR CODE HERE ****/
 
 }
 
+void handle_client_msg(char* buf, ssize_t len)
+{
 
+}
 
 /* Main function to receive and deal with messages from chat server
  * and client control process.  
@@ -127,18 +136,52 @@ void handle_received_msg(char *buf)
 void receive_msgs()
 {
   char *buf = (char *)malloc(MAX_MSG_LEN);
-  
+
   if (buf == 0) {
     printf("Could not malloc memory for message buffer\n");
     exit(1);
   }
 
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(udp_fd, &fds);
 
-  /**** YOUR CODE HERE ****/
 
   while(TRUE) {
+    ssize_t msg_len = 0;
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec= 100000;
 
-    /**** YOUR CODE HERE ****/
+    bzero(buf, MAX_MSG_LEN);
+    // check the UDP connection for any incoming messages with select.
+    msg_len = select(udp_fd+1, &fds, NULL, NULL, &tv);
+    if (msg_len < 0)
+    {
+      perror("client_recv select()");
+    }
+    else if(FD_ISSET(udp_fd, &fds)) // probably don't need to check the FD, but oh well.
+    {
+      msg_len = recvfrom(udp_fd, buf, MAX_MSG_LEN, 0, NULL, 0);
+      if(msg_len<0) {
+        perror("client_recv recvfrom");
+        return;
+      }
+      handle_received_msg(buf);
+
+    }
+
+    bzero(buf, MAX_MSG_LEN);
+    // check the IPC message for any incoming message from the chat client
+    msg_len = msgrcv(ctrl2rcvr_qid, buf, MAX_MSG_LEN, 0, IPC_NOWAIT);
+    if (msg_len < 0){
+      if (errno != ENOMSG)
+        perror("client_recv msgrcv");
+    }
+    else
+    {
+      handle_client_msg (buf, msg_len);
+    }
 
   }
 
