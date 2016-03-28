@@ -69,9 +69,9 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
  *      The tcp connection.
  *    char* data:
  *      The message content.
- *    size_t data:
+ *    u_int16_t data:
  *      The size of the message.
- *    size_t* respond_size:
+ *    u_int16_t* respond_size:
  *      The size of the respond
  *    int* nerror:
  *      The error code if any.
@@ -83,8 +83,8 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
  */
 char* send_tcp_request(struct tcp_connection* tcp_con, 
                     char* data, 
-                    size_t data_size,
-                    size_t* respond_size,
+                    u_int16_t data_size,
+                    u_int16_t* respond_size,
                     int* nerror) {
   int io_result = write(tcp_con->sock, data, data_size);
   if( io_result < 0 ) {
