@@ -155,3 +155,9 @@ struct receiver_manager* create_receiver_manager()
 
   return receiver_mgr;
 }
+
+void receiver_printf(struct receiver_manager* receiver_manager, char* message) {
+}
+
+void shutdown_receiver(struct receiver_manager* receiver_manager) {
+}
