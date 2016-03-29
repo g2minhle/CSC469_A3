@@ -214,6 +214,7 @@ void chat_interface(struct client_core* cli_core) {
   char* user_input;
   bool _continue = TRUE;
   char *buf = (char *)malloc(MAX_MSGDATA);
+
   while(_continue) {
     user_input = get_user_input(cli_core->member_name, buf);
     
@@ -226,9 +227,10 @@ void chat_interface(struct client_core* cli_core) {
       cli_core_send_chatmsg(cli_core, buf);
     }
   }  
-  
-  cli_core_quit(cli_core);  
+
   free(buf);  
+  cli_core_quit(cli_core);  
+  cli_core_shutdown(cli_core);
 }
 
 #include "http_connection.h"
@@ -247,8 +249,7 @@ int main(int argc, char **argv)
                                                     chatcli_ctx.server_tcp_port,
                                                     chatcli_ctx.server_udp_port);  
   if (cli_core) {  
-    chat_interface(cli_core);    
-    free(cli_core);
+    chat_interface(cli_core);
     return 0;
   }
   return 1;

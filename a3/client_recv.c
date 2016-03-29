@@ -189,7 +189,7 @@ void receive_msgs(struct client_receiver_context* ctx) {
 
   fd_set fds;
   FD_ZERO(&fds);
-  FD_SET(ctx->udp_port, &fds);
+  FD_SET(ctx->udp_fd, &fds);
 
   while(TRUE) {
     handle_chatserver(ctx, buf, &fds);
