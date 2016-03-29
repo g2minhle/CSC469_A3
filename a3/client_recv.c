@@ -208,7 +208,7 @@ void receive_msgs()
 
     bzero(buf, MAX_MSG_LEN);
     // check the IPC message for any incoming message from the chat client
-    msg_len = msgrcv(ctrl2rcvr_qid, buf, MAX_MSG_LEN, 0, IPC_NOWAIT);
+    msg_len = msgrcv(ctrl2rcvr_qid, buf, MAX_MSG_LEN, RECV_TYPE, IPC_NOWAIT);
     if (msg_len < 0 && errno != ENOMSG)
     {
         perror("client_recv msgrcv");
