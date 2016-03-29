@@ -157,6 +157,28 @@ struct receiver_manager* create_receiver_manager()
 }
 
 void receiver_printf(struct receiver_manager* receiver_manager, char* message) {
+  uint8_t* data = (uint8_t*) malloc(MAX_MSG_LEN);
+
+  if (data == NULL)
+  {
+    perror("receiver_mgr malloc");
+    return;
+  }
+
+  /* fill out the header/metadata for the IPC msg */
+  msg_t* hdr = (msg_t*)data;
+  hdr->mtype=RECV_TYPE;
+  hdr->body.status=CHAT_QUIT;
+
+  /* generate and fill in the struct to hold the message */
+  chat_msghdr* msg = (chat_msghdr) (data+sizeof(msg_t));
+  msg->sender.member_name="*********\0";
+  msg->msg_len = strnlen(message, MAX_MSG_LEN-sizeof(msg_t)-sizeof(chat_msghdr));
+  strncpy(*(msg->msgdata), message, msg_len);
+  uint8_t* endp = data+MAX_MSG_LEN-1;
+  *endp = '\0';
+
+  msgsnd(receiver_manager->ctrl2rcvr_qid, &msg, sizeof(msg_t)+sizeof(chat_msghdr)+msg->msg_len-1, 0);
 }
 
 void shutdown_receiver(struct receiver_manager* receiver_manager) {
