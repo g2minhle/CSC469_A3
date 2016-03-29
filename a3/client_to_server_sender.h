@@ -7,7 +7,7 @@
 
 #include "defs.h"
 #include "tcp_connection.h"
-#include "location_server_manager.h"
+#include "chatserver_manager.h"
 
 /*
  * This struct sends and revices all control requests and 
@@ -15,9 +15,8 @@
  */
 struct client_to_server_sender {
   pthread_mutex_t sender_lock;
-  struct location_server_manager* loc_srv_mgr;
+  struct chatserver_manager* chatserver_manager;
 };
-
 
 /*
  * Create control request sender
@@ -34,8 +33,10 @@ struct client_to_server_sender {
  *    struct client_to_server_sender*:
  *      The control request sender.
  */
-struct client_to_server_sender* create_ctrl_request_sender();
-
+struct client_to_server_sender* create_client_to_server_sender(char* server_host_name,
+                                                                u_int16_t server_tcp_port,
+                                                                u_int16_t server_udp_port);
+void destroy_client_to_server_sender(struct client_to_server_sender* sender);
 
 char* send_register_request(struct client_to_server_sender* sender, char* member_name, u_int16_t udp_port, u_int16_t* member_id);
 

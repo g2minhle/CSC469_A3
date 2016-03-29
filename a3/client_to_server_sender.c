@@ -68,11 +68,11 @@ char* send_control_msg(struct client_to_server_sender* sender,
                         u_int16_t* respond_size) {
   pthread_mutex_lock(&sender->sender_lock);
   
-  int loc_srv_mgr_result;
+  int chatserver_manager_result;
   int nerror;
-  struct location_server_manager* loc_srv_mgr = sender->loc_srv_mgr;
-  int tcp_port = loc_srv_mgr->tcp_port;
-  char* host_name = loc_srv_mgr->host_name; 
+  struct chatserver_manager* chatserver_manager = sender->chatserver_manager;
+  int tcp_port = chatserver_manager->tcp_port;
+  char* host_name = chatserver_manager->host_name; 
   char* respond;
 
   // Keep trying until we make a connection
@@ -80,8 +80,8 @@ char* send_control_msg(struct client_to_server_sender* sender,
     struct tcp_connection* tcp_con = create_tcp_connection(host_name, tcp_port, &nerror);      
     
     if (tcp_con == NULL) {
-      loc_srv_mgr_result = refresh_chatserver(loc_srv_mgr);
-      if (loc_srv_mgr_result != 0) {
+      chatserver_manager_result = refresh_chatserver(chatserver_manager);
+      if (chatserver_manager_result != 0) {
         // TODO #improvement: Handle the case location server failed
       }
       continue;
@@ -90,8 +90,8 @@ char* send_control_msg(struct client_to_server_sender* sender,
     
     if (respond == NULL) {
       close_tcp_connection(tcp_con);
-      loc_srv_mgr_result = refresh_chatserver(loc_srv_mgr);
-      if (loc_srv_mgr_result != 0) {
+      chatserver_manager_result = refresh_chatserver(chatserver_manager);
+      if (chatserver_manager_result != 0) {
         // TODO #improvement: Handle the case location server failed
       }
       continue;
@@ -284,7 +284,9 @@ void send_heart_beat(struct client_to_server_sender* sender, u_int16_t member_id
  *    struct client_to_server_sender*:
  *      The control request sender.
  */
-struct client_to_server_sender* create_ctrl_request_sender() {
+struct client_to_server_sender* create_client_to_server_sender(char* server_host_name,
+                                                                u_int16_t server_tcp_port,
+                                                                u_int16_t server_udp_port) {
   
   struct client_to_server_sender* ctrl_sender = (struct client_to_server_sender*)malloc(
     sizeof(struct client_to_server_sender)
@@ -292,9 +294,11 @@ struct client_to_server_sender* create_ctrl_request_sender() {
   
   if(ctrl_sender == NULL) return NULL;
     
-  ctrl_sender->loc_srv_mgr = create_location_server_manager();
+  ctrl_sender->chatserver_manager = create_chatserver_manager(server_host_name,
+                                                                server_tcp_port,
+                                                                server_udp_port);
   
-  if(ctrl_sender->loc_srv_mgr == NULL) {
+  if(ctrl_sender->chatserver_manager == NULL) {
     free(ctrl_sender);
     return NULL;
   }
@@ -302,4 +306,9 @@ struct client_to_server_sender* create_ctrl_request_sender() {
   pthread_mutex_init(&ctrl_sender->sender_lock, NULL);     
   
   return ctrl_sender;
+}
+
+void destroy_client_to_server_sender(struct client_to_server_sender* sender){
+  destroy_chatserver_manager(sender->chatserver_manager);
+  free(sender);
 }
