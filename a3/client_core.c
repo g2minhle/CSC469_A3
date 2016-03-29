@@ -13,7 +13,6 @@ struct client_core* create_client_core(char* member_name,
     create_client_to_server_sender(server_host_name, server_tcp_port, server_udp_port);
   
   if (client_to_server_sender == NULL) {
-    shutdown_receiver(receiver_mgr);
     destroy_receiver_manager(receiver_mgr);
     return NULL;
   }
@@ -24,16 +23,24 @@ struct client_core* create_client_core(char* member_name,
                                           cli_core->member_name,
                                           receiver_mgr->client_udp_port,
                                           &cli_core->member_id);
+                                          
+  cli_core->sender = client_to_server_sender;
+  cli_core->receiver_manager = receiver_mgr;
+                                            
   if(error_msg) {
-    fprintf(stderr, "%s \n", error_msg);
-    shutdown_receiver(receiver_mgr);
-    free(receiver_mgr);
+    fprintf(stderr, "Registration Failed: %s \n", error_msg);
     free(error_msg);
-    destroy_client_to_server_sender(client_to_server_sender);
+    cli_core_shutdown(cli_core);
     return NULL;
   }       
-
+      
   return cli_core;    
+}
+
+void cli_core_shutdown(struct client_core* cli_core) {
+  destroy_client_to_server_sender(cli_core->sender);
+  destroy_receiver_manager(cli_core->receiver_manager);
+  free(cli_core);  
 }
 
 void cli_core_room_list_request(struct client_core* cli_core) {
