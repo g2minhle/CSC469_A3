@@ -188,3 +188,8 @@ void shutdown_receiver(struct receiver_manager* receiver_manager) {
 
   msgsnd(receiver_manager->ctrl2rcvr_qid, &msg, sizeof(msg_t), 0);
 }
+
+void destroy_receiver_manager(struct receiver_manager* receiver_manager) {
+  shutdown_receiver(receiver_manager);
+  free(receiver_manager);
+}
