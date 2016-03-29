@@ -160,4 +160,9 @@ void receiver_printf(struct receiver_manager* receiver_manager, char* message) {
 }
 
 void shutdown_receiver(struct receiver_manager* receiver_manager) {
+  msg_t msg;
+  msg.mtype=RECV_TYPE;
+  msg.body.status=CHAT_QUIT;
+
+  msgsnd(receiver_manager->ctrl2rcvr_qid, &msg, sizeof(msg_t), 0);
 }
