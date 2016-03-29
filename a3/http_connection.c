@@ -62,13 +62,13 @@ char* send_http_request(struct http_connection* http_con, char* url, u_int16_t* 
   u_int16_t request_len = strlen(http_request_template) + strnlen(url, HTTP_MAX_URL_LEN) + 1;
   char* request = (char*) malloc(request_len);
   sprintf (request, http_request_template, url);
-  *http_status = 200;
   char* raw_respond = send_tcp_request(http_con->tcp_con, request, request_len, &respond_size, nerror);
   
   if (raw_respond == NULL) return NULL;
      
   char* previous = NULL;
   char* token = strtok(raw_respond, "\r\n");
+  sscanf (token, "%*s %d %*s", (unsigned int *)http_status);   
   while( token != NULL ) {
     previous = token;
     token = strtok(NULL, "\r\n");
