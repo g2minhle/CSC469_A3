@@ -1,16 +1,5 @@
-/*
- *   CSC469 Winter 2016
- *   Bogdan Simion
- *   Date: 19/03/2016
- *  
- *      File:      client.h 
- *      Author:    Angela Demke Brown
- *      Version:   1.0.0
- *      Date:      17/11/2010
- *   
- * Please report bugs/comments to bogdan@cs.toronto.edu
- *
- */
+#ifndef _CLIENT_H
+#define _CLIENT_H
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -61,3 +50,5 @@ typedef struct msgbuf {
 extern char *optarg; /* For option parsing */
 
 extern int retrieve_chatserver_info(char *chatserver_name, u_int16_t *tcp_port, u_int16_t *udp_port);
+
+#endif

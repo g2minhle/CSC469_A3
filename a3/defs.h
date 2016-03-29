@@ -68,6 +68,7 @@
 /* maximum length of a message */
 #define MAX_MSG_LEN		2048	
 
+#include <sys/types.h>
 
 /* data structures - message header size must be explicitly set to ensure
  * size is the same on 32-bit and 64-bit systems. The "packed" attribute
