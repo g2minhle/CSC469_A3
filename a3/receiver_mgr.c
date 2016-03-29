@@ -74,7 +74,7 @@ pid_t start_receiver(char* ctrl2rcvr_fname) {
     };
 
     execvp("xterm", argv);
-    printf("Child: exec returned. that can't be good.\n");
+    fprintf(stderr,"Child: exec returned. that can't be good.\n");
     exit(1);
   } 
   return receiver_pid;
@@ -101,7 +101,7 @@ int get_client_udp_port(int ctrl2rcvr_qid, u_int16_t* client_udp_port, pid_t rec
         printf("Start of receiver successful, port %u\n",msg.body.value);
         *client_udp_port = msg.body.value;
       } else {
-        printf("Start of receiver failed with code %u\n",msg.body.value);
+        fprintf(stderr,"Start of receiver failed with code %u\n",msg.body.value);
         return -1;
       }
       break;
@@ -114,9 +114,9 @@ int get_client_udp_port(int ctrl2rcvr_qid, u_int16_t* client_udp_port, pid_t rec
   if (numtries == IPC_GET_UDP_PORT_TRIALS ) {
     /* give up.  wait for receiver to exit so we get an exit code at least */
     int exitcode;
-    printf("Gave up waiting for msg.  Waiting for receiver to exit now\n");
+    fprintf(stderr,"Gave up waiting for msg.  Waiting for receiver to exit now\n");
     waitpid(receiver_pid, &exitcode, 0);
-    printf("Start of receiver failed, exited with code %d\n",exitcode);
+    fprintf(stderr,"Start of receiver failed, exited with code %d\n",exitcode);
     return -1;
   }
   return 0;

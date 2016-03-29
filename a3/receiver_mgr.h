@@ -30,7 +30,6 @@ struct receiver_manager {
 
 struct receiver_manager* create_receiver_manager();
 void receiver_printf(struct receiver_manager* receiver_manager, char* message);
-void shutdown_receiver(struct receiver_manager* receiver_manager);
 void destroy_receiver_manager(struct receiver_manager* receiver_manager);
 
 #endif
