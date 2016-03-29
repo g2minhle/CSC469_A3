@@ -186,7 +186,7 @@ void receive_msgs()
 
     bzero(buf, MAX_MSG_LEN);
     // check the UDP connection for any incoming messages with select.
-    msg_len = select(udp_fd+1, &fds, NULL, NULL, &tv);
+    msg_len = select(udp_fd, &fds, NULL, NULL, &tv);
     if (msg_len < 0)
     {
       perror("client_recv select()");
@@ -196,12 +196,12 @@ void receive_msgs()
       msg_len = recvfrom(udp_fd, buf, MAX_MSG_LEN, 0, NULL, 0);
 
       // Check if we failed to grab a message
-      if(msg_len<0) {
-        perror("client_recv recvfrom");
+      if(msg_len < 0) {
         /* don't do anything about this error. just log the error message */
-      }
-      else // we got a message
-      {
+        perror("client_recv recvfrom");
+      } else if (msg_len > 0) {
+        printf("%d \n", (int)msg_len);
+        // we got a message
         handle_received_msg(buf);
       }
     }
@@ -209,12 +209,8 @@ void receive_msgs()
     bzero(buf, MAX_MSG_LEN);
     // check the IPC message for any incoming message from the chat client
     msg_len = msgrcv(ctrl2rcvr_qid, buf, MAX_MSG_LEN, RECV_TYPE, IPC_NOWAIT);
-    if (msg_len < 0 && errno != ENOMSG)
-    {
-        perror("client_recv msgrcv");
-    }
-    else 
-    {
+    if (!(msg_len < 0 && errno == ENOMSG)) {
+      printf("%d \n", (int)msg_len);
       msg_t* msg = (msg_t*)buf;
 
       // check if the message is telling the receiver to quit. in which case
