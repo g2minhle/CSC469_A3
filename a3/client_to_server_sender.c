@@ -173,7 +173,7 @@ char* handel_register_respond(char* respond, u_int16_t respond_len, u_int16_t* m
     strncpy(error_msg, (char*)msghdr->msgdata, error_msg_len);
     return error_msg;
   } else if (msghdr->msg_type == REGISTER_SUCC) {    
-    *member_id = msghdr->member_id;    
+    *member_id = msghdr->member_id;
     return NULL;
   } else {
     return NULL;
@@ -211,11 +211,16 @@ char* send_room_list_request(struct client_to_server_sender* sender, u_int16_t m
   u_int16_t respond_len;
   char* respond = send_control_msg(sender, request, request_len, &respond_len);
 
+  u_int16_t msg_len = respond_len - sizeof(struct control_msghdr) + 1;
+  char* msg = (char*) malloc(msg_len);
+  strncpy(msg, (char*)(((struct control_msghdr*)respond)->msgdata), msg_len);
+  
   free(request);
-  return respond;
+  free(respond);
+  return msg;
 }
 
-void send_member_list_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name) {
+char* send_member_list_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name) {
   u_int16_t request_len;
   u_int16_t room_name_len = strnlen(room_name, MAX_ROOM_NAME_LEN);
   
@@ -224,11 +229,16 @@ void send_member_list_request(struct client_to_server_sender* sender, u_int16_t 
   u_int16_t respond_len;
   char* respond = send_control_msg(sender, request, request_len, &respond_len);
   
-  free(respond);
+  u_int16_t msg_len = respond_len - sizeof(struct control_msghdr) + 1;
+  char* msg = (char*) malloc(msg_len);
+  strncpy(msg, (char*)(((struct control_msghdr*)respond)->msgdata), msg_len);
+  
   free(request);
+  free(respond);
+  return msg;
 }
 
-void send_switch_room_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name) {
+char* send_switch_room_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name) {
   u_int16_t request_len;
   u_int16_t room_name_len = strnlen(room_name, MAX_ROOM_NAME_LEN);
   
@@ -237,8 +247,13 @@ void send_switch_room_request(struct client_to_server_sender* sender, u_int16_t 
   u_int16_t respond_len;
   char* respond = send_control_msg(sender, request, request_len, &respond_len);
   
-  free(respond);
+  u_int16_t msg_len = respond_len - sizeof(struct control_msghdr) + 1;
+  char* msg = (char*) malloc(msg_len);
+  strncpy(msg, (char*)(((struct control_msghdr*)respond)->msgdata), msg_len);
+  
   free(request);
+  free(respond);
+  return msg;
 }
 
 char* send_create_room_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name) {
@@ -250,8 +265,13 @@ char* send_create_room_request(struct client_to_server_sender* sender, u_int16_t
   u_int16_t respond_len;
   char* respond = send_control_msg(sender, request, request_len, &respond_len);
   
+  u_int16_t msg_len = respond_len - sizeof(struct control_msghdr) + 1;
+  char* msg = (char*) malloc(msg_len);
+  strncpy(msg, (char*)(((struct control_msghdr*)respond)->msgdata), msg_len);
+  
   free(request);
-  return respond;
+  free(respond);
+  return msg;
 }
 
 void send_quit_request(struct client_to_server_sender* sender, u_int16_t member_id) {
