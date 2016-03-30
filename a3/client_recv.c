@@ -145,7 +145,11 @@ int handle_chatclient(struct client_receiver_context* ctx, char *buf) {
   return 0;
 }
 
-void handle_chatserver(struct client_receiver_context* ctx, char *buf, fd_set* fds) {
+void handle_chatserver(struct client_receiver_context* ctx, char *buf) {
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(ctx->udp_fd, &fds);
+
   ssize_t msg_len = 0;
   struct timeval tv;
   tv.tv_sec = 0;
@@ -153,19 +157,14 @@ void handle_chatserver(struct client_receiver_context* ctx, char *buf, fd_set* f
 
   bzero(buf, MAX_MSG_LEN);
   // check the UDP connection for any incoming messages with select.
-  msg_len = select(ctx->udp_fd, fds, NULL, NULL, &tv);
-  if (msg_len < 0)
-  {
+  msg_len = select(ctx->udp_fd + 1, &fds, NULL, NULL, &tv);
+  if (msg_len < 0) {
     perror("client_recv select()");
     return;
   }
-  if (tv.tv_usec==0) // timed out, and no message
-    return;
-
-  if(FD_ISSET(ctx->udp_fd, fds)) // probably don't need to check the FD, but oh well.
-  {
+   
+  if(FD_ISSET(ctx->udp_fd, &fds)) {
     msg_len = recvfrom(ctx->udp_fd, buf, MAX_MSG_LEN, 0, NULL, 0);
-
     // Check if we failed to grab a message
     if(msg_len < 0) {
       /* don't do anything about this error. just log the error message */
@@ -196,12 +195,8 @@ void receive_msgs(struct client_receiver_context* ctx) {
     exit(1);
   }
 
-  fd_set fds;
-  FD_ZERO(&fds);
-  FD_SET(ctx->udp_fd, &fds);
-
   while(TRUE) {
-    handle_chatserver(ctx, buf, &fds);
+    handle_chatserver(ctx, buf);
     if(handle_chatclient(ctx, buf)) break;
   }
 
