@@ -159,7 +159,7 @@ void handle_chatserver(struct client_receiver_context* ctx, char *buf, fd_set* f
     perror("client_recv select()");
     return;
   }
-  if (tv.tv_usec==0 && msg_len == 0) // timed out, and no message
+  if (tv.tv_usec==0) // timed out, and no message
     return;
 
   if(FD_ISSET(ctx->udp_fd, fds)) // probably don't need to check the FD, but oh well.
