@@ -44,7 +44,9 @@ void cli_core_shutdown(struct client_core* cli_core) {
 }
 
 void cli_core_room_list_request(struct client_core* cli_core) {
-  send_room_list_request(cli_core->sender, cli_core->member_id);
+  receiver_printf(cli_core->receiver_manager, respond);
+  char* respond = send_room_list_request(cli_core->sender, cli_core->member_id);
+  free(respond);
 }
 
 void cli_core_member_list_request(struct client_core* cli_core, char* room_name) {
@@ -56,7 +58,9 @@ void cli_core_switch_room_request(struct client_core* cli_core, char* room_name)
 }
 
 void cli_core_create_room_request(struct client_core* cli_core, char* room_name) {
-  send_create_room_request(cli_core->sender, cli_core->member_id, room_name);
+  receiver_printf(cli_core->receiver_manager, respond);
+  char* respond = send_create_room_request(cli_core->sender, cli_core->member_id, room_name);
+  free(respond);
 }
 
 void cli_core_heart_beat(struct client_core* cli_core) {

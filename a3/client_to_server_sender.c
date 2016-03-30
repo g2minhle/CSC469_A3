@@ -204,15 +204,15 @@ char* send_register_request(struct client_to_server_sender* sender,
   return error_msg;
 }
 
-void send_room_list_request(struct client_to_server_sender* sender, u_int16_t member_id) {
+char* send_room_list_request(struct client_to_server_sender* sender, u_int16_t member_id) {
   u_int16_t request_len;
   char* request = prepare_request_with_no_data(ROOM_LIST_REQUEST, member_id, &request_len);
   
   u_int16_t respond_len;
   char* respond = send_control_msg(sender, request, request_len, &respond_len);
-  
-  free(respond);
+
   free(request);
+  return respond;
 }
 
 void send_member_list_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name) {
@@ -241,7 +241,7 @@ void send_switch_room_request(struct client_to_server_sender* sender, u_int16_t 
   free(request);
 }
 
-void send_create_room_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name) {
+char* send_create_room_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name) {
   u_int16_t request_len;
   u_int16_t room_name_len = strnlen(room_name, MAX_ROOM_NAME_LEN);
   
@@ -250,8 +250,8 @@ void send_create_room_request(struct client_to_server_sender* sender, u_int16_t 
   u_int16_t respond_len;
   char* respond = send_control_msg(sender, request, request_len, &respond_len);
   
-  free(respond);
   free(request);
+  return respond;
 }
 
 void send_quit_request(struct client_to_server_sender* sender, u_int16_t member_id) {

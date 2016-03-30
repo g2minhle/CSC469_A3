@@ -40,10 +40,10 @@ void destroy_client_to_server_sender(struct client_to_server_sender* sender);
 
 char* send_register_request(struct client_to_server_sender* sender, char* member_name, u_int16_t udp_port, u_int16_t* member_id);
 
-void send_room_list_request(struct client_to_server_sender* sender, u_int16_t member_id);
+char* send_room_list_request(struct client_to_server_sender* sender, u_int16_t member_id);
 void send_member_list_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name);
 void send_switch_room_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name);
-void send_create_room_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name);
+char* send_create_room_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name);
 void send_quit_request(struct client_to_server_sender* sender, u_int16_t member_id);
 void send_heart_beat(struct client_to_server_sender* sender, u_int16_t member_id);
 
