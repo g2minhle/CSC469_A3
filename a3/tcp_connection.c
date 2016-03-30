@@ -37,6 +37,7 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
   host_entry = gethostbyname(host_name);
 
   if (!host_entry) {
+    free(tcp_con);
     *nerror = TCP_ERROR_CANNOT_RESOLVE_HOST;
     return NULL;
   } 
@@ -49,11 +50,13 @@ struct tcp_connection* create_tcp_connection(const char* host_name,
   /* open socket */
   tcp_con->sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if ( tcp_con->sock < 0 ) {
+    free(tcp_con);
     *nerror = TCP_CANNOT_BIND_TO_SOCKET;
     return NULL;
   }
 
   if( connect(tcp_con->sock, (struct sockaddr*)&addr, sizeof(addr)) < 0 ) {
+    free(tcp_con);
     *nerror = TCP_CANNOT_CONNECT;
     return NULL;
   }

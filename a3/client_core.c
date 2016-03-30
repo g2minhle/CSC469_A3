@@ -80,5 +80,5 @@ void cli_core_quit(struct client_core* cli_core){
 }
 
 void cli_core_send_chatmsg(struct client_core* cli_core, char* chat_message){
-  send_chat_msg (cli_core->sender, cli_core->member_name, chat_message);
+  send_chat_msg (cli_core->sender, chat_message, cli_core->member_id);
 }

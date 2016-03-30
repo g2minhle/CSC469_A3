@@ -26,7 +26,7 @@ SERVER_OBJS = server_util.o server_main.o
 
 
 CLIENT_BIN = chatclient receiver
-CLIENT_OBJS = client_main.o client_util.o tcp_connection.o http_connection.o client_to_server_sender.o chatserver_manager.o client_core.o receiver_mgr.o
+CLIENT_OBJS = client_main.o client_util.o tcp_connection.o udp_connection.o http_connection.o client_to_server_sender.o chatserver_manager.o client_core.o receiver_mgr.o
 RECVR_OBJS = client_recv.o client_util.o
 
 all: $(SERVER_BIN) $(CLIENT_BIN)
@@ -46,6 +46,7 @@ client_to_server_sender.o: client_to_server_sender.c client_to_server_sender.h
 chatserver_manager.o: chatserver_manager.c chatserver_manager.h
 client_core.o: client_core.c client_core.h client_main.h
 receiver_mgr.o: receiver_mgr.c receiver_mgr.h
+udp_connection.o: udp_connection.c udp_connection.h
 
 client_util.o: client_util.c client.h defs.h
 client_main.o: client_main.c client.h defs.h 

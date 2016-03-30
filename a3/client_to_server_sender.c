@@ -173,6 +173,7 @@ char* handel_register_respond(char* respond, u_int16_t respond_len, u_int16_t* m
     strncpy(error_msg, (char*)msghdr->msgdata, error_msg_len);
     return error_msg;
   } else if (msghdr->msg_type == REGISTER_SUCC) {    
+    printf("%d\n", msghdr->member_id);
     *member_id = msghdr->member_id;
     return NULL;
   } else {
@@ -335,7 +336,7 @@ void destroy_client_to_server_sender(struct client_to_server_sender* sender) {
 
 
 /* Given the ctos sender and the chat message to be sent, send the chat message */
-void send_chat_msg (struct client_to_server_sender* sender, char* member_name, char* cmsg) {
+void send_chat_msg (struct client_to_server_sender* sender, char* cmsg, u_int16_t member_id) {
   uint8_t* msg = (uint8_t*) malloc(MAX_MSG_LEN);
   if (msg == NULL) {
     perror("client_to_server_sender malloc");
@@ -346,12 +347,21 @@ void send_chat_msg (struct client_to_server_sender* sender, char* member_name, c
    * the msg_t header. therefore, just set up the chat_msghdr */
   bzero(msg, MAX_MSG_LEN);
   struct chat_msghdr* cmh = (struct chat_msghdr*) (msg);
-  size_t cmsg_len = strnlen(cmsg, MAX_MSG_LEN - sizeof(struct chat_msghdr));
-  size_t msg_len = sizeof(struct chat_msghdr) + cmsg_len;
+  u_int16_t cmsg_len = strnlen(cmsg, MAX_MSG_LEN - sizeof(struct chat_msghdr));
+  u_int16_t msg_len = sizeof(struct chat_msghdr) + cmsg_len;  
 
-  strncpy((char*)cmh->msgdata, cmsg, cmsg_len);
-  strncpy(cmh->sender.member_name, member_name, MAX_MEMBER_NAME_LEN);
-  cmh->msg_len = msg_len;
+  memcpy(cmh->msgdata, cmsg, cmsg_len);
+  cmh->sender.member_id = htons(member_id);
+  cmh->msg_len = htons(cmsg_len);
 
-  send(0,msg, msg_len, 0);
+  int nerror;
+  struct chatserver_manager* chatserver_manager = sender->chatserver_manager;
+  int udp_port = chatserver_manager->udp_port;
+  char* host_name = chatserver_manager->host_name; 
+
+  struct udp_connection* udp_con = create_udp_connection(host_name, udp_port, &nerror); 
+  send_udp_request(udp_con,(char*) msg, msg_len, &nerror);
+  close_udp_connection(udp_con);
+
+  free(msg);
 }
