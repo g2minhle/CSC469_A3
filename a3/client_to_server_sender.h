@@ -47,4 +47,6 @@ char* send_create_room_request(struct client_to_server_sender* sender, u_int16_t
 void send_quit_request(struct client_to_server_sender* sender, u_int16_t member_id);
 void send_heart_beat(struct client_to_server_sender* sender, u_int16_t member_id);
 
+void send_chat_msg (struct client_to_server_sender* sender, char* member_name, char* cmsg);
+
 #endif

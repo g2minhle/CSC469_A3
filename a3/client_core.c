@@ -44,30 +44,30 @@ void cli_core_shutdown(struct client_core* cli_core) {
 }
 
 void cli_core_room_list_request(struct client_core* cli_core) {
-  receiver_printf(cli_core->receiver_manager ,"Sending room list request");
+  receiver_printf(cli_core->receiver_manager, "Sending room list request");
   char* respond = send_room_list_request(cli_core->sender, cli_core->member_id);
-  printf(respond);
+  receiver_printf(cli_core->receiver_manager, respond);
   free(respond);
 }
 
 void cli_core_member_list_request(struct client_core* cli_core, char* room_name) {
-  receiver_printf(cli_core->receiver_manager ,"Sending member list request");
+  receiver_printf(cli_core->receiver_manager, "Sending member list request");
   char* respond = send_member_list_request(cli_core->sender, cli_core->member_id, room_name);
-  printf(respond);
+  receiver_printf(cli_core->receiver_manager, respond);
   free(respond);
 }
 
 void cli_core_switch_room_request(struct client_core* cli_core, char* room_name) {
-  receiver_printf(cli_core->receiver_manager ,"Sending switch room request");
+  receiver_printf(cli_core->receiver_manager, "Sending switch room request");
   char* respond = send_switch_room_request(cli_core->sender, cli_core->member_id, room_name);
-  printf(respond);
+  receiver_printf(cli_core->receiver_manager, respond);
   free(respond);
 }
 
 void cli_core_create_room_request(struct client_core* cli_core, char* room_name) {
-  receiver_printf(cli_core->receiver_manager ,"Sending create request");
+  receiver_printf(cli_core->receiver_manager, "Sending create request");
   char* respond = send_create_room_request(cli_core->sender, cli_core->member_id, room_name);
-  printf(respond);
+  receiver_printf(cli_core->receiver_manager, respond);
   free(respond);
 }
 
@@ -80,4 +80,5 @@ void cli_core_quit(struct client_core* cli_core){
 }
 
 void cli_core_send_chatmsg(struct client_core* cli_core, char* chat_message){
+  send_chat_msg (cli_core->sender, cli_core->member_name, chat_message);
 }

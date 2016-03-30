@@ -1,6 +1,7 @@
 #ifndef _CLIENT_CORE_H
 #define _CLIENT_CORE_H
 
+#include <pthread.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -13,6 +14,7 @@
  * just an interface that interact with this core struct
  */
 struct client_core {
+  pthread_t *thread;
   char* member_name;
   u_int16_t member_id;
   struct client_to_server_sender* sender;

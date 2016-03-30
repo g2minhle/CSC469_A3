@@ -115,7 +115,7 @@ void init_receiver(struct client_receiver_context* ctx) {
 /* Function to deal with a single message from the chat server */
 void handle_received_msg(char *buf) {
 	struct chat_msghdr* cmh = (struct chat_msghdr *)buf;
-  printf("%s: %s\n", (char *)cmh->sender.member_name, (char*)(cmh->msgdata));
+  printf("%s: %s\n", cmh->sender.member_name, (char*)(cmh->msgdata));
 }
 
 int handle_chatclient(struct client_receiver_context* ctx, char *buf) {
@@ -123,16 +123,17 @@ int handle_chatclient(struct client_receiver_context* ctx, char *buf) {
   // check the IPC message for any incoming message from the chat client
   ssize_t msg_len = msgrcv(ctx->ctrl2rcvr_qid, buf, MAX_MSG_LEN, RECV_TYPE, IPC_NOWAIT);
   if (msg_len <= 0) {
-    if(errno != ENOMSG){
-    perror("cleint_recv msgrcv");
+    if(errno != ENOMSG) {
+      perror("cleint_recv msgrcv");
+      return 1;
     }
-    return 1;
+    return 0;
   }
   msg_t* msg = (msg_t*)buf;
 
   // check if the message is telling the receiver to quit. in which case
   // exit immediately after closing all communication channels
-  if (msg->body.status==CHAT_QUIT){
+  if (msg->body.status == CHAT_QUIT){
     printf("Exitting the chat. Have a good day.\n");
     close(ctx->udp_port);
     return 1;
@@ -197,7 +198,7 @@ void receive_msgs(struct client_receiver_context* ctx) {
 
   while(TRUE) {
     handle_chatserver(ctx, buf, &fds);
-    handle_chatclient(ctx, buf);
+    if(handle_chatclient(ctx, buf)) break;
   }
 
   /* Cleanup */
