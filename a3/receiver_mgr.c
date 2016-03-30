@@ -169,18 +169,15 @@ void receiver_printf(struct receiver_manager* receiver_manager, char* message) {
   /* fill out the header/metadata for the IPC msg */
   msg_t* hdr = (msg_t*)data;
   hdr->mtype=RECV_TYPE;
-  hdr->body.status=CHAT_QUIT;
+  hdr->body.status=RECV_READY;
 
   /* generate and fill in the struct to hold the message */
   struct chat_msghdr* msg = (struct chat_msghdr*) (data+sizeof(msg_t));
   strncpy(msg->sender.member_name, "*****\0", MAX_MEMBER_NAME_LEN);
   msg->msg_len = strnlen(message, MAX_MSG_LEN-sizeof(msg_t)-sizeof(struct chat_msghdr));
   strncpy((char*)(msg->msgdata), message, msg->msg_len);
-  uint8_t* endp = data+MAX_MSG_LEN-1;
-  *endp = '\0';
 
-  msgsnd(receiver_manager->ctrl2rcvr_qid, &msg, sizeof(struct body_s)+sizeof(struct chat_msghdr)+msg->msg_len-1, 0);
-  free(data);
+  msgsnd(receiver_manager->ctrl2rcvr_qid, data, sizeof(struct body_s)+sizeof(struct chat_msghdr)+msg->msg_len, 0);
 }
 
 void shutdown_receiver(struct receiver_manager* receiver_manager) {

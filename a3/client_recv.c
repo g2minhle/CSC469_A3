@@ -115,28 +115,32 @@ void init_receiver(struct client_receiver_context* ctx) {
 /* Function to deal with a single message from the chat server */
 void handle_received_msg(char *buf) {
 	struct chat_msghdr* cmh = (struct chat_msghdr *)buf;
-  printf("%s: %s\n", (char *)cmh->sender.member_name, *(cmh->msgdata));
+  printf("%s: %s\n", (char *)cmh->sender.member_name, (char*)(cmh->msgdata));
 }
 
 int handle_chatclient(struct client_receiver_context* ctx, char *buf) {
   bzero(buf, MAX_MSG_LEN);
   // check the IPC message for any incoming message from the chat client
   ssize_t msg_len = msgrcv(ctx->ctrl2rcvr_qid, buf, MAX_MSG_LEN, RECV_TYPE, IPC_NOWAIT);
-  if (!(msg_len < 0 && errno == ENOMSG)) {
-    msg_t* msg = (msg_t*)buf;
-
-    // check if the message is telling the receiver to quit. in which case
-    // exit immediately after closing all communication channels
-    if (msg->body.status==CHAT_QUIT){
-      printf("Exitting the chat. Have a good day.\n");
-      close(ctx->udp_port);
-      return 1;
+  if (msg_len <= 0) {
+    if(errno != ENOMSG){
+    perror("cleint_recv msgrcv");
     }
-
-    // else it's a simple message. get the chat_msg struct that falls
-    // after the msg_t header information.
-    handle_received_msg(buf + sizeof(msg_t));
+    return 1;
   }
+  msg_t* msg = (msg_t*)buf;
+
+  // check if the message is telling the receiver to quit. in which case
+  // exit immediately after closing all communication channels
+  if (msg->body.status==CHAT_QUIT){
+    printf("Exitting the chat. Have a good day.\n");
+    close(ctx->udp_port);
+    return 1;
+  }
+
+  // else it's a simple message. get the chat_msg struct that falls
+  // after the msg_t header information.
+  handle_received_msg((char*)(buf + sizeof(msg_t)));
   return 0;
 }
 
@@ -144,7 +148,7 @@ void handle_chatserver(struct client_receiver_context* ctx, char *buf, fd_set* f
   ssize_t msg_len = 0;
   struct timeval tv;
   tv.tv_sec = 0;
-  tv.tv_usec= 100000;
+  tv.tv_usec= 100;
 
   bzero(buf, MAX_MSG_LEN);
   // check the UDP connection for any incoming messages with select.
@@ -193,7 +197,7 @@ void receive_msgs(struct client_receiver_context* ctx) {
 
   while(TRUE) {
     handle_chatserver(ctx, buf, &fds);
-    if(handle_chatclient(ctx, buf)) break;
+    handle_chatclient(ctx, buf);
   }
 
   /* Cleanup */
