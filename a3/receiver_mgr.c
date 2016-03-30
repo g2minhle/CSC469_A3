@@ -178,7 +178,7 @@ void receiver_printf(struct receiver_manager* receiver_manager, char* message) {
   uint8_t* endp = data+MAX_MSG_LEN-1;
   *endp = '\0';
 
-  msgsnd(receiver_manager->ctrl2rcvr_qid, &msg, sizeof(msg_t)+sizeof(struct chat_msghdr)+msg->msg_len-1, 0);
+  msgsnd(receiver_manager->ctrl2rcvr_qid, &msg, sizeof(struct body_s)+sizeof(struct chat_msghdr)+msg->msg_len-1, 0);
 }
 
 void shutdown_receiver(struct receiver_manager* receiver_manager) {
@@ -186,7 +186,7 @@ void shutdown_receiver(struct receiver_manager* receiver_manager) {
   msg.mtype=RECV_TYPE;
   msg.body.status=CHAT_QUIT;
 
-  msgsnd(receiver_manager->ctrl2rcvr_qid, &msg, sizeof(msg_t), 0);
+  msgsnd(receiver_manager->ctrl2rcvr_qid, &msg, sizeof(struct body_s), 0);
 }
 
 void destroy_receiver_manager(struct receiver_manager* receiver_manager) {
