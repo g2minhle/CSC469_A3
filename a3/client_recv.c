@@ -157,8 +157,12 @@ void handle_chatserver(struct client_receiver_context* ctx, char *buf, fd_set* f
   if (msg_len < 0)
   {
     perror("client_recv select()");
+    return;
   }
-  else if(FD_ISSET(ctx->udp_fd, fds)) // probably don't need to check the FD, but oh well.
+  if (tv.tv_usec==0 && msg_len == 0) // timed out, and no message
+    return;
+
+  if(FD_ISSET(ctx->udp_fd, fds)) // probably don't need to check the FD, but oh well.
   {
     msg_len = recvfrom(ctx->udp_fd, buf, MAX_MSG_LEN, 0, NULL, 0);
 
