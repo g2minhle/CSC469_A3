@@ -332,3 +332,28 @@ void destroy_client_to_server_sender(struct client_to_server_sender* sender){
   destroy_chatserver_manager(sender->chatserver_manager);
   free(sender);
 }
+
+
+/* Given the ctos sender and the chat message to be sent, send the chat message */
+void send_chat_msg (struct client_to_server_sender* sender, char* cmsg)
+{
+  uint8_t* msg = (uint8_t*) malloc(MAX_MSG_LEN);
+  if (msg==NULL)
+  {
+    perror("client_to_server_sender malloc");
+    return;
+  }
+
+  /* since this is being sent to the server and not through IPC, we don't need
+   * the msg_t header. therefore, just set up the chat_msghdr */
+  bzero(msg, MAX_MSG_LEN);
+  struct chat_msghdr* cmh = (struct chat_msghdr*) (msg);
+  size_t cmsg_len = strnlen(cmsg, MAX_MSG_LEN-sizeof(struct chat_msghdr));
+  size_t msg_len = sizeof(struct chat_msghdr) + cmsg_len;
+
+  strncpy((char*)cmh->msgdata, cmsg, cmsg_len);
+  strncpy(cmh->sender.member_name, "hello\0", MAX_MEMBER_NAME_LEN);
+  cmh->msg_len = msg_len;
+
+  send(0,msg, msg_len, 0);
+}
