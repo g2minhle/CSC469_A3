@@ -46,7 +46,6 @@ void decode_control_msghdr(struct control_msghdr* msghdr,
   msghdr->msg_len = ntohs(msg_len);
 }
 
-
 /* Given the response from a control request, depending on the response type,
  * determine what should be outputted and sent to the client receiver. */
 char* process_response (char* resp, u_int16_t resp_len, char* extra)
@@ -83,6 +82,21 @@ char* process_response (char* resp, u_int16_t resp_len, char* extra)
   return msg;
 }
 
+void re_register_func(struct client_to_server_sender* sender){
+  while (1) {
+    char* error_msg = send_register_request(sender, 
+                                            sender->cli_core->member_name,
+                                            sender->cli_core->receiver_manager->client_udp_port,
+                                            &(sender->cli_core->member_id));
+    if(error_msg) {
+      free(error_msg);
+      sprintf(sender->cli_core->member_name, "%s_", sender->cli_core->member_name);          
+    } else {
+      return;       
+    }    
+  }
+}
+
 /*
  * Send a control message given the sender, the message and the size of the
  * the message. If the chatserver cannot be reach, the function will evoke the 
@@ -102,7 +116,8 @@ char* process_response (char* resp, u_int16_t resp_len, char* extra)
 char* send_control_msg(struct client_to_server_sender* sender, 
                         char* request, 
                         u_int16_t request_size, 
-                        u_int16_t* respond_size) {
+                        u_int16_t* respond_size,
+                        bool re_register) {
   pthread_mutex_lock(&sender->sender_lock);
   int nerror;
   int tcp_port;
@@ -121,6 +136,10 @@ char* send_control_msg(struct client_to_server_sender* sender,
       chatserver_manager_result = refresh_chatserver(chatserver_manager);
       if (chatserver_manager_result != 0) {
         // TODO #improvement: Handle the case location server failed
+      } else {
+        if(re_register) {
+          re_register_func(sender);
+        }
       }
       continue;
     }
@@ -131,6 +150,10 @@ char* send_control_msg(struct client_to_server_sender* sender,
       chatserver_manager_result = refresh_chatserver(chatserver_manager);
       if (chatserver_manager_result != 0) {
         // TODO #improvement: Handle the case location server failed
+      } else {
+        if(re_register) {
+          re_register_func(sender);
+        }
       }
       continue;
     }
@@ -233,7 +256,7 @@ char* send_register_request(struct client_to_server_sender* sender,
   // We should always get back a respond since if the chatserver fail
   // "send_control_msg" will try to poke location server for a new chatserver.
   u_int16_t respond_len;
-  char* respond = send_control_msg(sender, request, request_len, &respond_len);
+  char* respond = send_control_msg(sender, request, request_len, &respond_len, FALSE);
   
   // TODO #improvement: Handle the case when cannot send a ctrl request
   
@@ -250,8 +273,8 @@ char* send_room_list_request(struct client_to_server_sender* sender, u_int16_t m
   char* request = prepare_request_with_no_data(ROOM_LIST_REQUEST, member_id, &request_len);
   
   u_int16_t respond_len;
-  char* respond = send_control_msg(sender, request, request_len, &respond_len);
-  
+  char* respond = send_control_msg(sender, request, request_len, &respond_len, TRUE);
+
   char * msg = process_response (respond, respond_len, "\0");
   free(request);
   free(respond);
@@ -265,7 +288,7 @@ char* send_member_list_request(struct client_to_server_sender* sender, u_int16_t
   char* request = prepare_request_with_data(MEMBER_LIST_REQUEST, member_id, &request_len, room_name, room_name_len);
   
   u_int16_t respond_len;
-  char* respond = send_control_msg(sender, request, request_len, &respond_len);
+  char* respond = send_control_msg(sender, request, request_len, &respond_len, TRUE);
   
   char * msg = process_response (respond, respond_len, room_name);
   free(request);
@@ -280,7 +303,7 @@ char* send_switch_room_request(struct client_to_server_sender* sender, u_int16_t
   char* request = prepare_request_with_data(SWITCH_ROOM_REQUEST, member_id, &request_len, room_name, room_name_len);
   
   u_int16_t respond_len;
-  char* respond = send_control_msg(sender, request, request_len, &respond_len);
+  char* respond = send_control_msg(sender, request, request_len, &respond_len, TRUE);
   
   char * msg = process_response (respond, respond_len, room_name);
   free(request);
@@ -295,7 +318,7 @@ char* send_create_room_request(struct client_to_server_sender* sender, u_int16_t
   char* request = prepare_request_with_data(CREATE_ROOM_REQUEST, member_id, &request_len, room_name, room_name_len);
   
   u_int16_t respond_len;
-  char* respond = send_control_msg(sender, request, request_len, &respond_len);
+  char* respond = send_control_msg(sender, request, request_len, &respond_len, TRUE);
   
   char * msg = process_response (respond, respond_len, "\0");
   free(request);
@@ -308,7 +331,7 @@ void send_quit_request(struct client_to_server_sender* sender, u_int16_t member_
   char* request = prepare_request_with_no_data(QUIT_REQUEST, member_id, &request_len);
   
   u_int16_t respond_len;
-  char* respond = send_control_msg(sender, request, request_len, &respond_len);
+  char* respond = send_control_msg(sender, request, request_len, &respond_len, TRUE);
   
   free(respond);
   free(request);
@@ -319,7 +342,7 @@ void send_heart_beat(struct client_to_server_sender* sender, u_int16_t member_id
   char* request = prepare_request_with_no_data(MEMBER_KEEP_ALIVE, member_id, &request_len);
   
   u_int16_t respond_len;
-  char* respond = send_control_msg(sender, request, request_len, &respond_len);
+  char* respond = send_control_msg(sender, request, request_len, &respond_len, TRUE);
 
   free(respond);
   free(request);
@@ -352,8 +375,11 @@ struct client_to_server_sender* create_client_to_server_sender(char* server_host
     return NULL;
   }
 
-  pthread_mutex_init(&ctrl_sender->sender_lock, NULL);     
-  
+  pthread_mutexattr_t Attr;
+
+  pthread_mutexattr_init(&Attr);
+  pthread_mutexattr_settype(&Attr, PTHREAD_MUTEX_RECURSIVE);
+  pthread_mutex_init(&ctrl_sender->sender_lock, &Attr);
   return ctrl_sender;
 }
 

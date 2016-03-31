@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #include "defs.h"
+#include "client_core.h"
 #include "tcp_connection.h"
 #include "udp_connection.h"
 #include "chatserver_manager.h"
@@ -16,6 +17,7 @@
  */
 struct client_to_server_sender {
   pthread_mutex_t sender_lock;
+  struct client_core* cli_core;
   struct chatserver_manager* chatserver_manager;
 };
 
