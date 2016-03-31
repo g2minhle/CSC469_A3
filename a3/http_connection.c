@@ -68,7 +68,7 @@ char* send_http_request(struct http_connection* http_con, char* url, u_int16_t* 
      
   char* previous = NULL;
   char* token = strtok(raw_respond, "\r\n");
-  sscanf (token, "%*s %d %*s", (unsigned int *)http_status);   
+  sscanf (token, "%*s %hu %*s", http_status);   
   while( token != NULL ) {
     previous = token;
     token = strtok(NULL, "\r\n");

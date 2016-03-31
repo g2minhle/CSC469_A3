@@ -67,16 +67,17 @@ char* send_control_msg(struct client_to_server_sender* sender,
                         u_int16_t request_size, 
                         u_int16_t* respond_size) {
   pthread_mutex_lock(&sender->sender_lock);
-  
-  int chatserver_manager_result;
   int nerror;
-  struct chatserver_manager* chatserver_manager = sender->chatserver_manager;
-  int tcp_port = chatserver_manager->tcp_port;
-  char* host_name = chatserver_manager->host_name; 
+  int tcp_port;
   char* respond;
+  int chatserver_manager_result;
+  struct chatserver_manager* chatserver_manager = sender->chatserver_manager;
+  char* host_name = chatserver_manager->host_name; 
 
   // Keep trying until we make a connection
   while (1) {
+    tcp_port = chatserver_manager->tcp_port;
+
     struct tcp_connection* tcp_con = create_tcp_connection(host_name, tcp_port, &nerror);      
     
     if (tcp_con == NULL) {

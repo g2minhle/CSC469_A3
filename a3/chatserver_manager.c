@@ -21,11 +21,11 @@ int refresh_chatserver(struct chatserver_manager* chatserver_mgr) {
   u_int16_t http_status;
   struct http_connection* http_con = create_http_connection(LOC_SERV_HOST_NAME, LOC_SERV_PORT, &nerror);  
   char* respond = send_http_request(http_con, LOC_SERV_URL, &http_status, &nerror);  
-  sscanf (respond, "%s %u %u", 
+  sscanf (respond, "%s %hu %hu", 
             chatserver_mgr->host_name,
-            (unsigned int*)&chatserver_mgr->tcp_port, 
-            (unsigned int*)&chatserver_mgr->udp_port);
-              
+            &chatserver_mgr->tcp_port, 
+            &chatserver_mgr->udp_port);
+  
   close_http_connection(http_con);
   free(respond);
   return 0;
