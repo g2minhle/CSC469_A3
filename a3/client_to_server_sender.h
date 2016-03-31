@@ -39,6 +39,7 @@ struct client_to_server_sender* create_client_to_server_sender(char* server_host
                                                                 u_int16_t server_udp_port);
 void destroy_client_to_server_sender(struct client_to_server_sender* sender);
 
+char* process_response (char* resp, u_int16_t resp_len, char* extra);
 char* send_register_request(struct client_to_server_sender* sender, char* member_name, u_int16_t udp_port, u_int16_t* member_id);
 
 char* send_room_list_request(struct client_to_server_sender* sender, u_int16_t member_id);

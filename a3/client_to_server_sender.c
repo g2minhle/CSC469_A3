@@ -46,6 +46,43 @@ void decode_control_msghdr(struct control_msghdr* msghdr,
   msghdr->msg_len = ntohs(msg_len);
 }
 
+
+/* Given the response from a control request, depending on the response type,
+ * determine what should be outputted and sent to the client receiver. */
+char* process_response (char* resp, u_int16_t resp_len, char* extra)
+{
+  struct control_msghdr* resp_hdr = (struct control_msghdr*) resp;
+  u_int16_t msg_len = resp_len - sizeof(struct control_msghdr) + 1;
+
+  if (msg_len <= 1) // there will be a null char
+    msg_len = 100+MAX_ROOM_NAME_LEN; // want to returm a msg, so allocate some space
+
+  char* msg = (char*) malloc(msg_len);
+  //TODO: error check mallocs
+  bzero(msg, msg_len);
+
+  switch (ntohs(resp_hdr->msg_type)){
+    case REGISTER_SUCC:
+    case REGISTER_FAIL:
+    case ROOM_LIST_SUCC:
+    case ROOM_LIST_FAIL:
+    case MEMBER_LIST_SUCC:
+    case MEMBER_LIST_FAIL:
+    case SWITCH_ROOM_FAIL:
+    case CREATE_ROOM_FAIL:
+      strncpy(msg, (char*)(resp_hdr->msgdata), msg_len);
+      break;
+    case SWITCH_ROOM_SUCC:
+      snprintf(msg, msg_len, "Successfully switched to room %s", extra);
+      break;
+    case CREATE_ROOM_SUCC:
+      snprintf(msg, msg_len, "Successfully created room %s", extra);
+      break;
+  }
+
+  return msg;
+}
+
 /*
  * Send a control message given the sender, the message and the size of the
  * the message. If the chatserver cannot be reach, the function will evoke the 
@@ -212,11 +249,8 @@ char* send_room_list_request(struct client_to_server_sender* sender, u_int16_t m
   
   u_int16_t respond_len;
   char* respond = send_control_msg(sender, request, request_len, &respond_len);
-
-  u_int16_t msg_len = respond_len - sizeof(struct control_msghdr) + 1;
-  char* msg = (char*) malloc(msg_len);
-  strncpy(msg, (char*)(((struct control_msghdr*)respond)->msgdata), msg_len);
   
+  char * msg = process_response (respond, respond_len, "\0");
   free(request);
   free(respond);
   return msg;
@@ -231,10 +265,7 @@ char* send_member_list_request(struct client_to_server_sender* sender, u_int16_t
   u_int16_t respond_len;
   char* respond = send_control_msg(sender, request, request_len, &respond_len);
   
-  u_int16_t msg_len = respond_len - sizeof(struct control_msghdr) + 1;
-  char* msg = (char*) malloc(msg_len);
-  strncpy(msg, (char*)(((struct control_msghdr*)respond)->msgdata), msg_len);
-  
+  char * msg = process_response (respond, respond_len, room_name);
   free(request);
   free(respond);
   return msg;
@@ -249,10 +280,7 @@ char* send_switch_room_request(struct client_to_server_sender* sender, u_int16_t
   u_int16_t respond_len;
   char* respond = send_control_msg(sender, request, request_len, &respond_len);
   
-  u_int16_t msg_len = respond_len - sizeof(struct control_msghdr) + 1;
-  char* msg = (char*) malloc(msg_len);
-  strncpy(msg, (char*)(((struct control_msghdr*)respond)->msgdata), msg_len);
-  
+  char * msg = process_response (respond, respond_len, room_name);
   free(request);
   free(respond);
   return msg;
@@ -267,10 +295,7 @@ char* send_create_room_request(struct client_to_server_sender* sender, u_int16_t
   u_int16_t respond_len;
   char* respond = send_control_msg(sender, request, request_len, &respond_len);
   
-  u_int16_t msg_len = respond_len - sizeof(struct control_msghdr) + 1;
-  char* msg = (char*) malloc(msg_len);
-  strncpy(msg, (char*)(((struct control_msghdr*)respond)->msgdata), msg_len);
-  
+  char * msg = process_response (respond, respond_len, "\0");
   free(request);
   free(respond);
   return msg;
