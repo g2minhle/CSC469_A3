@@ -1,5 +1,7 @@
 #include "client_core.h"
 
+pthread_t hb_thread;
+
 struct client_core* create_client_core(char* member_name,   
                                         char* server_host_name,
                                         u_int16_t server_tcp_port,
@@ -71,11 +73,31 @@ void cli_core_create_room_request(struct client_core* cli_core, char* room_name)
   free(respond);
 }
 
-void cli_core_heart_beat(struct client_core* cli_core) {
-  send_heart_beat(cli_core->sender,cli_core->member_id);
+void start_hb_thread(struct client_core* cli_core)
+{
+  pthread_attr_t attr;
+  if(pthread_attr_init(&attr)){
+    printf("error!");
+  }
+  if (pthread_create(&hb_thread, &attr, cli_core_heart_beat, (void*)cli_core))
+  {
+    perror("heartbeat pthread_create");
+  }
+  
+}
+
+void* cli_core_heart_beat(void* param) {
+  struct client_core* cli_core = (struct client_core*) param;
+  while (1){
+    send_heart_beat(cli_core->sender,cli_core->member_id);
+    sleep(5);
+  }
+  return NULL;
 }
 
 void cli_core_quit(struct client_core* cli_core){
+  if(pthread_kill(hb_thread, SIGKILL))
+    perror("heartbeat thread pthread_kill");
   send_quit_request(cli_core->sender, cli_core->member_id);
 }
 

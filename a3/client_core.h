@@ -31,9 +31,10 @@ void cli_core_room_list_request(struct client_core* cli_core);
 void cli_core_member_list_request(struct client_core* cli_core, char* room_name);
 void cli_core_switch_room_request(struct client_core* cli_core, char* room_name);
 void cli_core_create_room_request(struct client_core* cli_core, char* room_name);
-void cli_core_heart_beat(struct client_core* cli_core);
+void* cli_core_heart_beat(void* param);
 void cli_core_quit(struct client_core* cli_core);
 void cli_core_send_chatmsg(struct client_core* cli_core, char* chat_message);
+void start_hb_thread(struct client_core* cli_core);
 
 
 
