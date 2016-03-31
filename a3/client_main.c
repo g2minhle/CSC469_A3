@@ -249,6 +249,7 @@ int main(int argc, char **argv)
                                                     chatcli_ctx.server_tcp_port,
                                                     chatcli_ctx.server_udp_port);  
   if (cli_core) {  
+    start_hb_thread(cli_core);
     chat_interface(cli_core);
     return 0;
   }
