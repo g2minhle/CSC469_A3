@@ -20,7 +20,7 @@ VERSION=1
 ###########################################################################
 
 CC = gcc
-CFLAGS = -pthread -Wall -g #-DUSE_LOCN_SERVER
+CFLAGS = -pthread -Wall -g -DDBUG #-DUSE_LOCN_SERVER
 SERVER_BIN = chatserver 
 SERVER_OBJS = server_util.o server_main.o
 

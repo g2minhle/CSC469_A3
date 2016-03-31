@@ -60,11 +60,13 @@ void get_agrs(struct chatclient_context* chatcli_ctx, int argc, char **argv){
 
 #ifdef USE_LOCN_SERVER
 
+#ifdef DBUG
   printf("Using location server to retrieve chatserver information\n");
 
   if (strlen(chatcli_ctx->member_name) == 0) {
     usage(argv);
   }
+#endif
 
 #else
 

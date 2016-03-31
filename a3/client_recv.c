@@ -34,7 +34,9 @@ void send_ok(int qid, u_int16_t port) {
 }
 
 void open_client_channel(struct client_receiver_context* ctx) {
+#ifdef DBUG
   printf("Trying to open client channel\n");
+#endif
   /* Get messsage channel */
   key_t key = ftok(ctx->ctrl2rcvr_fname, 42);
 
@@ -89,13 +91,17 @@ int init_udp_socket(struct client_receiver_context* ctx) {
   ctx->udp_port = ntohs(addr.sin_port);
   ctx->udp_fd = socket_fd;
   
+#ifdef DBUG
 	printf("Chat receiver listening on %s port: %hu\n", "UDP\0", ctx->udp_port);
+#endif
 	
 	return 0;
 }
 
 void init_receiver(struct client_receiver_context* ctx) {
+#ifdef DBUG
   printf("Initializing...\n");
+#endif
   /* 1. Make sure we can talk to parent (client control process) */ 
   open_client_channel(ctx);
 
@@ -190,7 +196,9 @@ void receive_msgs(struct client_receiver_context* ctx) {
   char *buf = (char *)malloc(MAX_MSG_LEN);
 
   if (buf == 0) {
+#ifdef DBUG
     printf("Could not malloc memory for message buffer\n");
+#endif
     close(ctx->udp_fd);
     exit(1);
   }
@@ -208,7 +216,9 @@ void receive_msgs(struct client_receiver_context* ctx) {
 void get_args(int argc, char **argv, struct client_receiver_context* ctx) {
   char option;
 
+#ifdef DBUG
   printf("RECEIVER alive: parsing options! (argc = %d)\n",argc);
+#endif
 
   while((option = getopt(argc, argv, option_string)) != -1) {
     switch(option) {

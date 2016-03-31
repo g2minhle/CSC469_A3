@@ -98,7 +98,9 @@ int get_client_udp_port(int ctrl2rcvr_qid, u_int16_t* client_udp_port, pid_t rec
       numtries++;
     } else if (result > 0) {
       if (msg.body.status == RECV_READY) {
+#ifdef DBUG
         printf("Start of receiver successful, port %u\n",msg.body.value);
+#endif
         *client_udp_port = msg.body.value;
       } else {
         fprintf(stderr,"Start of receiver failed with code %u\n",msg.body.value);

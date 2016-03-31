@@ -211,7 +211,9 @@ char* handel_register_respond(char* respond, u_int16_t respond_len, u_int16_t* m
     strncpy(error_msg, (char*)msghdr->msgdata, error_msg_len);
     return error_msg;
   } else if (msghdr->msg_type == REGISTER_SUCC) {    
+#ifdef DBUG
     printf("%d\n", msghdr->member_id);
+#endif
     *member_id = msghdr->member_id;
     return NULL;
   } else {
