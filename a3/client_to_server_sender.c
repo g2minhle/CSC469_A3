@@ -139,6 +139,7 @@ char* send_control_msg(struct client_to_server_sender* sender,
       } else {
         if(re_register) {
           re_register_func(sender);
+          receiver_printf(sender->cli_core->receiver_manager, "Successfully connected to a server");
         }
       }
       continue;
@@ -153,6 +154,7 @@ char* send_control_msg(struct client_to_server_sender* sender,
       } else {
         if(re_register) {
           re_register_func(sender);
+          receiver_printf(sender->cli_core->receiver_manager, "Successfully connected to a server");
         }
       }
       continue;
@@ -198,7 +200,9 @@ char* prepare_request_with_data(u_int16_t msg_type,
 
 
 char* prepare_register_request(u_int16_t udp_port, char* member_name, u_int16_t* request_len) {
+#ifdef DBUG
   printf("%s\n", member_name);
+#endif
   u_int16_t member_name_size = strnlen(member_name, MAX_MEMBER_NAME_LEN);
   u_int16_t msg_len = sizeof(struct register_msgdata) + member_name_size;
                   
@@ -208,7 +212,9 @@ char* prepare_register_request(u_int16_t udp_port, char* member_name, u_int16_t*
     
   msgdata->udp_port = htons(udp_port);
   strncpy((char*)msgdata->member_name, member_name, member_name_size);
+#ifdef DBUG
   printf("%s\n", (char*)msgdata->member_name);
+#endif
   
   char* respond = prepare_request_with_data(REGISTER_REQUEST, 0, request_len, (char*)msgdata, msg_len);
   

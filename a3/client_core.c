@@ -43,7 +43,11 @@ struct client_core* create_client_core(char* member_name,
     free(error_msg);
     cli_core_shutdown(cli_core);
     return NULL;
-  }       
+  } 
+  else 
+  {
+    receiver_printf(cli_core->receiver_manager, "Successfully connected to a server");
+  }
   
   return cli_core;    
 }
