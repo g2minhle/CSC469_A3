@@ -1,29 +1,44 @@
 = FILES =====================================================================
-
 Chat client files
-
-chatserver_manager.c: Handles the creation, initialization, refresing and destroing of a the chat server manager. The chat server manager  keeps track of what chat server the user is connected to.
-
-client_core.c: Interacts with the client core struct, which maintans the chat client information, such as the registered name, the sending information and receiver information. Forwards control requests and chat message, and contains functions for initializing the heartbeat mechanism.
-
-client_main.c: Contains the initial functions to handle user input, create the chat receiver, and to initialize neccessary structs.
-
-client_to_server_sender.c: 
-
-client_util.c:
-
-http_connection.c:
-
-receiver_mgr.c:
-
-tcp_connection.c
-
-udp_connection.c:
-
+chatserver_manager.c:     Handles the creating, initializing, refreshing and
+                          destroying the chat server manager. The chat server
+                          manager  keeps track of what chat server the user is
+                          connected to.
+client_core.c:            Interacts with the client core struct, which maintains
+                          the chat client information, such as the registered
+                          name, the sending information and receiver information.
+                          Forwards control requests and chat message, and
+                          contains functions for initializing the heartbeat
+                          mechanism.
+client_main.c:            Contains the initial functions to handle user input,
+                          create the chat receiver, and to initialize necessary
+                          structs.
+client_to_server_sender.c:Handles communication between the chat client and the
+                          chat server. Contains functions to send control
+                          requests over a TCP connection and parse the response,
+                          to send a chat message, to register with a chat server
+                          and to send heartbeat messages to the chat server.
+client_util.c:            Functions for dealing with a location server, like
+                          getting the location server's information.
+http_connection.c:        Contains functions for creating, sending a message on
+                          and closing a http connection.
+receiver_mgr.c:           Manages communication between the chat client and the
+                          chat receiver, which involves the initialization of
+                          the IPC channel, and sending and receiving messages
+                          over the ICP channel.
+tcp_connection.c:         Contains functions used for creating and closing a tcp
+                          connection, along with sending a message on the tcp
+                          connection.
+udp_connection.c:         Contains functions used for creating and closing a udp
+                          connection, along with sending a message through the
+                          udp connection.
 
 Chat receiver files
-
-client_rec.c:
+client_recv.c:            The chat receiver, which manages an IPC channel with
+                          the chat client, typically printing whatever the chat
+                          client send to the receiver, and maintains a UDP
+                          connection with the chat server in order to get all
+                          the chat messages that a client is supposed to see.
 
 
 = DESIGN ====================================================================
@@ -42,12 +57,23 @@ chatclient -------IPC-------> receiver
    ^______________IPC___________|
 
 
-Heartbeat: involves the chatclient sending a KEEP_MEMBER_ALIVE TCP message to the chatserver every 5 seconds. If the chatserver does not respond to the TCP SYN message 
+Program start up
 
 
+User sends a control request
+
+
+User sends a chat mesage
 
 
 = FAULT TOLERANCE ===========================================================
+
+Heartbeat:involves the chatclient sending a KEEP_MEMBER_ALIVE TCP message to
+          the chatserver every 5 seconds. If the chatserver does not respond
+          to the TCP SYN message, the connection with the server is regarded
+          as unusable. Then the client will attempt to reestablish a connection
+          with the location server if available, otherwise a local running chat
+          server otherwise.
 
 
 
