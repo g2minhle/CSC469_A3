@@ -28,7 +28,7 @@ struct tcp_connection {
 struct tcp_connection* create_tcp_connection(const char* host_name,
     int port, int* nerror);
 char* send_tcp_request(struct tcp_connection* tcp_con, char* data,
-    u_int16_t data_size, u_int16_t* respond_size, int* nerror);
+    u_int16_t data_size, u_int16_t* response_size, int* nerror);
 void close_tcp_connection(struct tcp_connection* tcp_con);
 
 #endif
