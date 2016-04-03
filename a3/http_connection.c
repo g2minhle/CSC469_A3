@@ -40,7 +40,7 @@ struct http_connection* create_http_connection(const char* host_name, int port, 
 
 
 /*
- * Send a tcp message throught the given tcp_connection and get the response.
+ * Send a tcp message through the given tcp_connection and get the response.
  *
  * Arg:
  *    struct tcp_connection* tcp_con:

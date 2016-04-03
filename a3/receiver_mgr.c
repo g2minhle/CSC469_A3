@@ -1,5 +1,6 @@
 #include "receiver_mgr.h"
 
+/* Initialize the IPC channel between the chat client and the client receiver. */
 int init_ipc_with_receiver(char* ctrl2rcvr_fname, int *qid)
 {
   /* Create IPC message queue for communication with receiver process */
@@ -56,6 +57,7 @@ int init_ipc_with_receiver(char* ctrl2rcvr_fname, int *qid)
   return 0;
 }
 
+/* Execute the client receiver process */
 pid_t start_receiver(char* ctrl2rcvr_fname)
 {
   pid_t receiver_pid = fork();
@@ -77,6 +79,7 @@ pid_t start_receiver(char* ctrl2rcvr_fname)
   return receiver_pid;
 }
 
+/* Return the udp port that corresponds to the udp port of the chat server */
 int get_client_udp_port(int ctrl2rcvr_qid, u_int16_t* client_udp_port, pid_t receiver_pid)
 {
   msg_t msg;
@@ -127,6 +130,7 @@ int get_client_udp_port(int ctrl2rcvr_qid, u_int16_t* client_udp_port, pid_t rec
 
 }
 
+/* Create, initalize and return the struct used to manage the client receiver. */
 struct receiver_manager* create_receiver_manager()
 {
   /*
@@ -155,6 +159,8 @@ struct receiver_manager* create_receiver_manager()
   return receiver_mgr;
 }
 
+/* Given a message, use the IPC channel in the receiver_manager to tell the chat
+ * receiver to print the message */
 void receiver_printf(struct receiver_manager* receiver_manager, char* message)
 {
   uint8_t* data = (uint8_t*) malloc(MAX_MSG_LEN);
@@ -179,6 +185,7 @@ void receiver_printf(struct receiver_manager* receiver_manager, char* message)
   free(data);
 }
 
+/* When quitting the chat client, proceed to kill the client receiver as well.*/
 void shutdown_receiver(struct receiver_manager* receiver_manager)
 {
   msg_t msg;

@@ -81,6 +81,7 @@ char* process_response (char* resp, u_int16_t resp_len, char* extra)
   return msg;
 }
 
+/* Reregister the client with the server */
 void re_register_func(struct client_to_server_sender* sender)
 {
   while (1)
@@ -165,6 +166,8 @@ char* send_control_msg(struct client_to_server_sender* sender, char* request,
   return response;
 }
 
+/* Prepare a client request that is meant to be sent to the chat server. However
+ * this request will contain no data. Return the prepared request */
 char* prepare_request_with_no_data(u_int16_t msg_type, u_int16_t member_id,
     u_int16_t* request_len)
 {
@@ -175,6 +178,7 @@ char* prepare_request_with_no_data(u_int16_t msg_type, u_int16_t member_id,
   return request;
 }
 
+/* Return a prepared request, which contains data. */
 char* prepare_request_with_data(u_int16_t msg_type, u_int16_t member_id,
     u_int16_t* request_len, char* msgdata, u_int16_t msg_len)
 {
@@ -209,6 +213,8 @@ char* prepare_register_request(u_int16_t udp_port, char* member_name, u_int16_t*
   return response;
 }
 
+/* Given the response from the chat server from a control request, handle the
+ * response accordingly */
 char* handle_register_response(char* response, u_int16_t response_len, u_int16_t* member_id)
 {
   struct control_msghdr* msghdr = (struct control_msghdr*)(response);
@@ -232,6 +238,8 @@ char* handle_register_response(char* response, u_int16_t response_len, u_int16_t
   return NULL;
 }
 
+/* Send a request to register the client with the chatserver. Return the
+ * chatserver's response. */
 char* send_register_request(struct client_to_server_sender* sender, char* member_name,
     u_int16_t udp_port, u_int16_t* member_id)
 {
@@ -251,6 +259,8 @@ char* send_register_request(struct client_to_server_sender* sender, char* member
   return error_msg;
 }
 
+/* Send a request to list all the rooms in the chatserver. Return the
+ * chatserver's response. */
 char* send_room_list_request(struct client_to_server_sender* sender, u_int16_t member_id)
 {
   u_int16_t request_len;
@@ -265,6 +275,8 @@ char* send_room_list_request(struct client_to_server_sender* sender, u_int16_t m
   return msg;
 }
 
+/* Send a request to list all the members in a rooms in the chatserver. Return the
+ * chatserver's response. */
 char* send_member_list_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name)
 {
   u_int16_t request_len;
@@ -281,6 +293,8 @@ char* send_member_list_request(struct client_to_server_sender* sender, u_int16_t
   return msg;
 }
 
+/* Send a request to switch to a specified rooms in the chatserver. Return the
+ * chatserver's response. */
 char* send_switch_room_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name)
 {
   u_int16_t request_len;
@@ -297,6 +311,8 @@ char* send_switch_room_request(struct client_to_server_sender* sender, u_int16_t
   return msg;
 }
 
+/* Send a request to create a specified rooms in the chatserver. Return the
+ * chatserver's response. */
 char* send_create_room_request(struct client_to_server_sender* sender, u_int16_t member_id, char* room_name)
 {
   u_int16_t request_len;
@@ -313,6 +329,7 @@ char* send_create_room_request(struct client_to_server_sender* sender, u_int16_t
   return msg;
 }
 
+/* Send a request to the chatserver that the client is quitting.*/
 void send_quit_request(struct client_to_server_sender* sender, u_int16_t member_id)
 {
   u_int16_t request_len;
@@ -325,6 +342,8 @@ void send_quit_request(struct client_to_server_sender* sender, u_int16_t member_
   free(request);
 }
 
+/* Send a heart beat message from the client to the chatserver. Handle the
+ * response accordingly. */
 void send_heart_beat(struct client_to_server_sender* sender, u_int16_t member_id)
 {
   u_int16_t request_len;

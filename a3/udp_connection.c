@@ -54,7 +54,7 @@ struct udp_connection* create_udp_connection(const char* host_name, int port, in
 }
 
 /*
- * Send a udp message throught the given udp_connection and get the response.
+ * Send a udp message through the given udp_connection and get the response.
  *
  * Arg:
  *    struct udp_connection* udp_con:

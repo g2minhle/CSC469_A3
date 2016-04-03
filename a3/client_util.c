@@ -41,43 +41,9 @@ static void build_req(char *buf)
 #endif /* USE_LOCN_SERVER */
 
 #ifdef USE_LOCN_SERVER
-static char *skip_http_headers(char *buf)
-{
-  /* Given a pointer to a buffer which contains an HTTP reply,
-   * skip lines until we find a blank, and then return a pointer
-   * to the start of the next line, which is the reply body.
-   *
-   * DO NOT call this function if buf does not contain an HTTP
-   * reply message.  The termination condition on the while loop
-   * is ill-defined for arbitrary character arrays, and may lead
-   * to bad things(TM).
-   *
-   * Feel free to improve on this.
-   */
-
-  char *curpos;
-  int n;
-  char line[256];
-
-  curpos = buf;
-
-  while ( sscanf(curpos,"%256[^\n]%n",line,&n) > 0) {
-    if (strlen(line) == 1) { /* Just the \r was consumed */
-      /* Found our blank */
-      curpos += n+1; /* skip line and \n at end */
-      break;
-    }
-    curpos += n+1;
-  }
-
-  return curpos;
-}
-#endif /* USE_LOCN_SERVER */
-
-#ifdef USE_LOCN_SERVER
 int retrieve_chatserver_info(char *chatserver_name, u_int16_t *tcp_port, u_int16_t *udp_port)
 {
-  int locn_socket_fd;
+  int locn_socket_fd = 0;
   char *buf;
   int buflen;
   int code;

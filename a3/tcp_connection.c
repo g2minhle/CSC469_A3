@@ -64,7 +64,7 @@ struct tcp_connection* create_tcp_connection(const char* host_name, int port, in
 }
 
 /*
- * Send a tcp message throught the given tcp_connection and get the response.
+ * Send a tcp message through the given tcp_connection and get the response.
  *
  * Arg:
  *    struct tcp_connection* tcp_con:

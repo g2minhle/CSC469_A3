@@ -103,6 +103,9 @@ int init_udp_socket(struct client_receiver_context* ctx)
   return 0;
 }
 
+/* Initialize the client receiver context struct, but initializing the
+ * receiver's communication channels with through a UDP port with the chat server,
+ * and an IPC channel with teh chat client. */
 void init_receiver(struct client_receiver_context* ctx)
 {
 #ifdef DBUG
@@ -133,6 +136,8 @@ void handle_received_msg(char *buf)
   printf("%s: %s\n", cmh->sender.member_name, (char*)(cmh->msgdata));
 }
 
+/* Handle the chatclient's communication channel by checking for messages
+ * and responding accordingly. */
 int handle_chatclient(struct client_receiver_context* ctx, char *buf)
 {
   bzero(buf, MAX_MSG_LEN);
@@ -165,6 +170,8 @@ int handle_chatclient(struct client_receiver_context* ctx, char *buf)
   return 0;
 }
 
+/* Handle the chatserver's communication channel by checking for messages
+ * and responding accordingly */
 void handle_chatserver(struct client_receiver_context* ctx, char *buf)
 {
   fd_set fds;
