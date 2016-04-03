@@ -1,0 +1,53 @@
+= FILES =====================================================================
+
+Chat client files
+
+chatserver_manager.c: Handles the creation, initialization, refresing and destroing of a the chat server manager. The chat server manager  keeps track of what chat server the user is connected to.
+
+client_core.c: Interacts with the client core struct, which maintans the chat client information, such as the registered name, the sending information and receiver information. Forwards control requests and chat message, and contains functions for initializing the heartbeat mechanism.
+
+client_main.c: Contains the initial functions to handle user input, create the chat receiver, and to initialize neccessary structs.
+
+client_to_server_sender.c: 
+
+client_util.c:
+
+http_connection.c:
+
+receiver_mgr.c:
+
+tcp_connection.c
+
+udp_connection.c:
+
+
+Chat receiver files
+
+client_rec.c:
+
+
+= DESIGN ====================================================================
+
+3 main components: chatserver, chatclient, receiver
+
+chatserver----UDP----------------
+ | ^    |                       |
+ | |    |                       |
+ | |    |                       |
+ TCP   UDP                      |
+ | |    |                       |
+ | |    |                       |
+ V |    V                       V
+chatclient -------IPC-------> receiver
+   ^______________IPC___________|
+
+
+Heartbeat: involves the chatclient sending a KEEP_MEMBER_ALIVE TCP message to the chatserver every 5 seconds. If the chatserver does not respond to the TCP SYN message 
+
+
+
+
+= FAULT TOLERANCE ===========================================================
+
+
+
