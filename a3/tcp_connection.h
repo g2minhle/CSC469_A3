@@ -21,65 +21,14 @@
 /*
  * Object represent a TCP connection
  */
-struct tcp_connection {  
-	int sock;
+struct tcp_connection {
+  int sock;
 };
 
-/*
- * Establish a TCP connection given the host name and the TCP port.
- *
- * Args:
- *    struct tcp_connection* tcp_con:
- *      The tcp connection.
- *    const char* host_name:
- *      The server host name.
- *    int port:
- *      The server port.
- *    int* nerror:
- *      The error code if any.
- *
- * Return:
- *    struct tcp_connection*:
- *      The new tcp connection.
- *      If there is an error return NULL;
- */
-struct tcp_connection* create_tcp_connection(const char* host_name, 
-                                            int port,
-                                            int* nerror);
-                        
-/*
- * Send a tcp message throught the given tcp_connection and get the respond.
- *
- * Arg:
- *    struct tcp_connection* tcp_con:
- *      The tcp connection.
- *    char* data:
- *      The message content.
- *    u_int16_t data:
- *      The size of the message.
- *    u_int16_t* respond_size:
- *      The size of the respond
- *    int* nerror:
- *      The error code if any.
- *
- * Return:
- *    char*:
- *      The pointer to the repond. 
- *      If there is an error then we will return NULL.
- */
-char* send_tcp_request(struct tcp_connection* tcp_con, 
-                    char* data, 
-                    u_int16_t data_size,
-                    u_int16_t* respond_size,
-                    int* nerror);
-
-/*
- * Close a TCP connection.
- *
- * Agrs:
- *    struct tcp_connection* tcp_con:
- *      The TCP connection.
- */
+struct tcp_connection* create_tcp_connection(const char* host_name,
+    int port, int* nerror);
+char* send_tcp_request(struct tcp_connection* tcp_con, char* data,
+    u_int16_t data_size, u_int16_t* respond_size, int* nerror);
 void close_tcp_connection(struct tcp_connection* tcp_con);
 
 #endif

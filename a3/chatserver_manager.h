@@ -22,12 +22,8 @@ struct chatserver_manager {
   char host_name[MAX_HOST_NAME_LEN];
   u_int16_t tcp_port;
   u_int16_t udp_port; 
-  // TODO #feature: enable this
-  //struct receiver_manager* receiver_mgr;
 };
 
-// TODO #feature: Enable this
-//struct location_server_manager* create_location_server_manager(struct receiver_manager* receiver_mgr) {
 struct chatserver_manager* create_chatserver_manager(char* host_name, u_int16_t tcp_port, u_int16_t udp_port);
 void destroy_chatserver_manager(struct chatserver_manager* chatserver_manager);
 int refresh_chatserver(struct chatserver_manager* chatserver_mgr);

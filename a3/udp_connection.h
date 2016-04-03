@@ -21,65 +21,14 @@
 /*
  * Object represent a udp connection
  */
-struct udp_connection {  
-	int sock;
-	struct sockaddr_in serveraddr;
+struct udp_connection {
+  int sock;
+  struct sockaddr_in serveraddr;
 };
 
-/*
- * Establish a udp connection given the host name and the udp port.
- *
- * Args:
- *    struct udp_connection* udp_con:
- *      The udp connection.
- *    const char* host_name:
- *      The server host name.
- *    int port:
- *      The server port.
- *    int* nerror:
- *      The error code if any.
- *
- * Return:
- *    struct udp_connection*:
- *      The new udp connection.
- *      If there is an error return NULL;
- */
-struct udp_connection* create_udp_connection(const char* host_name, 
-                                            int port,
-                                            int* nerror);
-                        
-/*
- * Send a udp message throught the given udp_connection and get the respond.
- *
- * Arg:
- *    struct udp_connection* udp_con:
- *      The udp connection.
- *    char* data:
- *      The message content.
- *    u_int16_t data:
- *      The size of the message.
- *    u_int16_t* respond_size:
- *      The size of the respond
- *    int* nerror:
- *      The error code if any.
- *
- * Return:
- *    char*:
- *      The pointer to the repond. 
- *      If there is an error then we will return NULL.
- */
-void send_udp_request(struct udp_connection* udp_con, 
-                    char* data, 
-                    u_int16_t data_size,
-                    int* nerror);
-
-/*
- * Close a udp connection.
- *
- * Agrs:
- *    struct udp_connection* udp_con:
- *      The udp connection.
- */
+struct udp_connection* create_udp_connection(const char* host_name, int port, int* nerror);
+void send_udp_request(struct udp_connection* udp_con, char* data,
+    u_int16_t data_size, int* nerror);
 void close_udp_connection(struct udp_connection* udp_con);
 
 #endif
