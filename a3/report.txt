@@ -45,25 +45,43 @@ client_recv.c:            The chat receiver, which manages an IPC channel with
 
 3 main components: chatserver, chatclient, receiver
 
-chatserver----UDP----------------
- | ^    |                       |
+chatserver -------UDP------------
+ | ^    ^                       |
  | |    |                       |
  | |    |                       |
  TCP   UDP                      |
  | |    |                       |
  | |    |                       |
- V |    V                       V
-chatclient -------IPC-------> receiver
-   ^______________IPC___________|
+ V |    |                       V
+chatclient<-------IPC------->receiver
 
 
-Program start up
-
+Program start up:
+  - Initialize the chat client.
+  - Start the receiver.
+  - Create the IPC channel from the chatclient to the receiver, where the
+    receiver's response is the udp port it'll use to receive messages on from
+    the chat server
+  - Create a TCP connection with the chatserver, and attempt to register the
+    user with the chat server.
 
 User sends a control request
-
+  - Chatclient gets user input for a control request.
+  - chatclient creates a TCP connection with the chatserver then sends a TCP
+    message, receiving a TCP message with a response in return.
+  - The chatclient parses the response, modifying the client's local, cached
+    state, and send an appropriate message throught the IPC channel to the
+    chatreceiver if needed, where the receiver prints out the received message.
 
 User sends a chat mesage
+  - Chatclient gets user input that is a chat message.
+  - The chatclient formulates a chat message UDP packet, and send that to the
+    chatserver.
+  - The chatserver sees the message, broadcasting it to all the members in the
+    room.
+  - The receiver receives a UDP packer containing a message from a user that
+    is in the same room as the client. The receiver prints out the
+    received chat message.
 
 
 = FAULT TOLERANCE ===========================================================
@@ -73,7 +91,5 @@ Heartbeat:involves the chatclient sending a KEEP_MEMBER_ALIVE TCP message to
           to the TCP SYN message, the connection with the server is regarded
           as unusable. Then the client will attempt to reestablish a connection
           with the location server if available, otherwise a local running chat
-          server otherwise.
-
-
+          server.
 
