@@ -89,30 +89,31 @@ User sends a chat message
 Heartbeat:involves the chatclient sending a KEEP_MEMBER_ALIVE TCP message to
           the chatserver every 5 seconds. If the chatserver does not respond,
           the connection with the server is regarded as failed. Then the
-          client will attempt to reestablish a connection with the location
-          server if available, otherwise a local running chatserver.
+          client will attempt to get the chat server's information from the
+          location server. If the location server is not available, then
+          continuously retry to get the info from the location server. 
 
 Reregistration: In the case of a server failing, we will attempt to use the
-                location server if it comes back up. Otherwise we will rely on
-                the local chat server. When we are able ot receive a TCP SYN-ACK
-                from a server, complete the TCP connection and request to
-                register the client with the chatserver. We do not attempt to
-                re-register the user in the room that it was in before the
-                failure. However, in the case that a user with the same name
-                already exists in the chatserver, we append a "_" the the client's
-                name to avoid conflict.
+                location server to get the address and port numbers of a 
+                new chatserver. When we get the new chatserver information, 
+                we re-register the client with the chatserver. In the case 
+                that a user with the same name already exists in the
+                chatserver, we append a "_" to the client's name to avoid
+                conflict. When reregistering the user if the room it was in
+                before the failure exists after reconnecting, the user is 
+                automatically switched to the room.
 
 
 = IMPLEMENTED ===============================================================
 
-  - TCP control message creation, sending and reponse handling
+  - TCP control message creation, sending and response handling
   - UDP chat message creation, sending and receiving
   - use of the location server
-  - dectection of server failures through TCP heartbeat messages
-  - recovery from server failure throught reregistration when failure is detected
+  - detection of server failures through TCP heartbeat messages
+  - recovery from server failure through reregistration when failure is detected
+  - after a server failed, and the user is reregistered with the chatserver,
+    add the user to the room it was in before
 
 
 = UNIMPLEMENTED =============================================================
 
-  - after a server failed, and the user is reregistered with the chatserver,
-    add the user to the room it was in before
