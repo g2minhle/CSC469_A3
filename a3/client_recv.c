@@ -192,7 +192,7 @@ void handle_chatserver(struct client_receiver_context* ctx, char *buf)
     return;
   }
 
-  if(FD_ISSET(ctx->udp_fd, &fds))
+  if(!FD_ISSET(ctx->udp_fd, &fds))
   {
     return;
   }
