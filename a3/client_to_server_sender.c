@@ -92,7 +92,7 @@ void re_register_func(struct client_to_server_sender* sender)
     {
       // Check if the name is already registered. if so, append a _ and try again
       struct control_msghdr* cmh = (struct control_msghdr*) error_msg;
-      if (strncmp((char*)(cmh->msgdata), "Name has already been used", 15) == 0)
+      if (strstr((char*)(cmh->msgdata), "already been used") != NULL)
       {
         sprintf(sender->cli_core->member_name, "%s_", sender->cli_core->member_name);
       }
