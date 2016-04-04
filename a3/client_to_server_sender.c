@@ -90,8 +90,17 @@ void re_register_func(struct client_to_server_sender* sender)
         sender->cli_core->receiver_manager->client_udp_port, &(sender->cli_core->member_id));
     if(error_msg)
     {
+      // Check if the name is already registered. if so, append a _ and try again
+      struct control_msghdr* cmh = (struct control_msghdr*) error_msg;
+      if (strncmp((char*)(cmh->msgdata), "Name has already been used", 15) == 0)
+      {
+        sprintf(sender->cli_core->member_name, "%s_", sender->cli_core->member_name);
+      }
+      else /* there was probably too many members on the server. wait and try again */
+      {
+        sleep (5); // hope someone leaves in that time. then try again.
+      }
       free(error_msg);
-      sprintf(sender->cli_core->member_name, "%s_", sender->cli_core->member_name);
     }
     else
     {
