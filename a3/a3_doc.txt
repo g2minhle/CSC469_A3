@@ -70,10 +70,10 @@ User sends a control request
   - chatclient creates a TCP connection with the chatserver then sends a TCP
     message, receiving a TCP message with a response in return.
   - The chatclient parses the response, modifying the client's local, cached
-    state, and send an appropriate message throught the IPC channel to the
+    state, and send an appropriate message through the IPC channel to the
     chatreceiver if needed, where the receiver prints out the received message.
 
-User sends a chat mesage
+User sends a chat message
   - Chatclient gets user input that is a chat message.
   - The chatclient formulates a chat message UDP packet, and send that to the
     chatserver.
