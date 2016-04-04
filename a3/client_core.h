@@ -17,6 +17,7 @@ struct client_core {
   pthread_t *thread;
   char* member_name;
   u_int16_t member_id;
+  char curr_room [MAX_MSG_LEN];
   struct client_to_server_sender* sender;
   struct receiver_manager* receiver_manager;
 };

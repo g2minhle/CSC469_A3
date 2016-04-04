@@ -150,6 +150,13 @@ char* send_control_msg(struct client_to_server_sender* sender, char* request,
       {
         re_register_func(sender);
         receiver_printf(sender->cli_core->receiver_manager, "Successfully connected to a server");
+
+        // Attempt to join the room  from before
+        struct control_msghdr* cmh = (struct control_msghdr*) send_switch_room_request(sender, sender->cli_core->member_id, sender->cli_core->curr_room);
+        if (ntohs(cmh->msg_type) != SWITCH_ROOM_SUCC)
+        {
+          bzero(sender->cli_core->curr_room, MAX_ROOM_NAME_LEN);
+        }
       }
       continue;
     }
@@ -163,6 +170,13 @@ char* send_control_msg(struct client_to_server_sender* sender, char* request,
       {
         re_register_func(sender);
         receiver_printf(sender->cli_core->receiver_manager, "Successfully connected to a server");
+
+        // Attempt to join the room  from before
+        struct control_msghdr* cmh = (struct control_msghdr*) send_switch_room_request(sender, sender->cli_core->member_id, sender->cli_core->curr_room);
+        if (ntohs(cmh->msg_type) != SWITCH_ROOM_SUCC)
+        {
+          bzero(sender->cli_core->curr_room, MAX_ROOM_NAME_LEN);
+        }
       }
       continue;
     }
@@ -313,6 +327,12 @@ char* send_switch_room_request(struct client_to_server_sender* sender, u_int16_t
 
   u_int16_t response_len;
   char* response = send_control_msg(sender, request, request_len, &response_len, TRUE);
+
+  struct control_msghdr* cmh = (struct control_msghdr*) response;
+  if (ntohs(cmh->msg_type) == SWITCH_ROOM_SUCC)
+  {
+    strncpy(sender->cli_core->curr_room, room_name, MAX_ROOM_NAME_LEN);
+  }
 
   char * msg = process_response (response, response_len, room_name);
   free(request);
